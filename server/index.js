@@ -2,6 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3001;
+const cors = require("cors");
+app.use(cors());
+
 
 const { v4: uuidv4 } = require("uuid"); // For generating unique user IDs
 
@@ -127,5 +130,38 @@ app.delete("/match-queue/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to remove from match queue" });
+  }
+});
+
+/// Get Route User
+app.get("/users", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM users ORDER BY created_at DESC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+//GET route for matching queue
+app.get("/match-queue", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM match_queue ORDER BY joined_at ASC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch match queue" });
+  }
+});
+
+//GET ROUTE for sessions
+app.get("/sessions", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM sessions ORDER BY started_at DESC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch sessions" });
   }
 });

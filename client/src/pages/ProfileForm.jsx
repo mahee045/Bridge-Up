@@ -1,0 +1,76 @@
+import React, { useState } from "react";
+import { createUser, addToMatchQueue } from "../api/user";
+
+///add word count, add drop down for interests, add potential social media handle coloum
+function ProfileForm() {
+
+  const [name, setName] = useState("");
+  const [interests, setInterests] = useState("");
+  const [bio, setBio] = useState("");
+
+  const handleSubmit = () => {
+    const userId = localStorage.getItem("userId");
+    const role = localStorage.getItem("userRole");
+  
+    if (!name.trim() || !interests.trim() || !bio.trim()) {
+      alert("Please fill out all fields before submitting.");
+      return;
+    }
+  
+    const interestsArray = interests.split(",").map((i) => i.trim());
+    console.log("🪪 userId being used:", userId);
+    createUser({
+      id: userId, // Make sure to pass this!
+      name,
+      role,
+      interests: interestsArray,
+      bio
+    })
+    .then((data) => {
+      console.log("✅ User inserted into DB:", data);
+      return addToMatchQueue({
+        user_id: userId, // Matches the one saved above
+        role,
+        interests: interestsArray,
+      });
+    })
+  }
+
+  return (
+    <div>
+      <h2> Tell us a bit about yourself </h2>
+      <div>
+  <label>Name</label>
+  <input
+    type="text"
+    placeholder="Enter your name"
+    value={name}
+    onChange={(e) => setName(e.target.value)}
+  />
+</div>
+
+<div>
+  <label>Interests</label>
+  <input
+    type="text"
+    placeholder="Enter your interests"
+    value={interests}
+    onChange={(e) => setInterests(e.target.value)}
+  />
+</div>
+
+<div>
+  <label>Bio</label>
+  <input
+    type="text"
+    placeholder="Enter a short bio and social media handles!"
+    value={bio}
+    onChange={(e) => setBio(e.target.value)}
+  />
+</div>
+<button onClick={handleSubmit}>Submit</button>
+    </div>
+  );
+}
+
+export default ProfileForm;
