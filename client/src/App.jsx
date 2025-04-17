@@ -11,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/profile-form" element={<ProfileForm />} />
+        <Route path="/matching-lobby" element={<MatchingLobby />} />
       </Routes>
     </Router>
   );

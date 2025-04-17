@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { createUser, addToMatchQueue } from "../api/user";
+import { useNavigate } from "react-router-dom";
 
 ///add word count, add drop down for interests, add potential social media handle coloum
 function ProfileForm() {
@@ -7,9 +8,10 @@ function ProfileForm() {
   const [name, setName] = useState("");
   const [interests, setInterests] = useState("");
   const [bio, setBio] = useState("");
+  const navigate = useNavigate();
+
 
   const handleSubmit = () => {
-    const userId = localStorage.getItem("userId");
     const role = localStorage.getItem("userRole");
   
     if (!name.trim() || !interests.trim() || !bio.trim()) {
@@ -18,23 +20,33 @@ function ProfileForm() {
     }
   
     const interestsArray = interests.split(",").map((i) => i.trim());
-    console.log("🪪 userId being used:", userId);
+  
     createUser({
-      id: userId, // Make sure to pass this!
       name,
       role,
       interests: interestsArray,
       bio
     })
-    .then((data) => {
-      console.log("✅ User inserted into DB:", data);
-      return addToMatchQueue({
-        user_id: userId, // Matches the one saved above
-        role,
-        interests: interestsArray,
+      .then((createdUser) => {
+        console.log("✅ User inserted into DB:", createdUser);
+  
+        return addToMatchQueue({
+          user_id: createdUser.id, // ✅ Now it exists!
+          role,
+          interests: interestsArray,
+        });
+      })
+      .then(() => {
+        alert("Submitted successfully!");
+        // Optionally navigate to matching lobby here
+      })
+      .catch((err) => {
+        console.error("❌ Something went wrong:", err);
+        alert("Something went wrong.");
       });
-    })
-  }
+
+      navigate("/matching-lobby"); //naviagete to the matching lobby
+  };
 
   return (
     <div>
