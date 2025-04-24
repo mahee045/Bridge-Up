@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import ProfileForm from "./pages/ProfileForm";
 import Home from "./pages/Home"; // If you have a separate Home, otherwise use Landing.
-import MatchingLobby from "./components/MatchingLobby";
+import MatchingLobby from "./pages/MatchingLobby";
 
 // You can remove either Landing or Home if you only use one for "/"
 function App() {
@@ -18,13 +18,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/profile-form" element={<ProfileForm />} />
         <Route
-          path="/lobby"
-          element={
-            <MatchingLobby
-              uuid={uuid}
-              role={role}
-              field={field}
-            />
+          path="/matching-lobby" element={<MatchingLobby uuid={uuid} role={role} field={field}/>
           }
         />
       </Routes>
