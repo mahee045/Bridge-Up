@@ -1,5 +1,4 @@
 import React from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 
 ///add emojis to the im a mentor and im a mentee button
@@ -8,12 +7,7 @@ function Landing() {
   const navigate = useNavigate(); // Add this
 
   const handleSelectRole = (role) => {
-    const userId = uuidv4();
-    localStorage.setItem("userRole", role);
-    localStorage.setItem("userId", userId);
-    console.log("User ID saved:", userId);         // ✅ See this in dev tools
-    console.log("Role selected:", role);
-    navigate("/profile-form");
+    navigate(`/profile-form?role=${role}`);
   };
 
   return (

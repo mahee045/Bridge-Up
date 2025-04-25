@@ -1,70 +1,78 @@
 // server/db/match.js
 
-const db = require("./index");
+const db = require("./index"); 
 const { v4: uuidv4 } = require("uuid");
 
-// Match one mentor and one mentee based on shared interests and waiting order
+// Find the mentee and the mentor with the most shared interests
 async function findAndCreateMatch() {
-  const client = await db.connect();
-
+  const client = await db.connect();///should not be there
   try {
     await client.query("BEGIN");
 
-    // 1. Find the oldest mentee waiting in the queue
+    // 1. Find the oldest mentee
     const menteeResult = await client.query(
       `SELECT * FROM match_queue WHERE role = 'mentee' ORDER BY joined_at ASC LIMIT 1`
     );
-
-    if (menteeResult.rows.length === 0) {
-      throw new Error("No mentees available.");
-    }
+    if (menteeResult.rows.length === 0) throw new Error("No mentees waiting.");
 
     const mentee = menteeResult.rows[0];
 
-    // 2. Find the oldest mentor with overlapping interests
-    const mentorResult = await client.query(
-      `SELECT * FROM match_queue
-       WHERE role = 'mentor'
-       AND interests && $1
-       ORDER BY joined_at ASC
-       LIMIT 1`,
-      [mentee.interests]
+    // 2. Find all mentors
+    const mentorsResult = await client.query(
+      `SELECT * FROM match_queue WHERE role = 'mentor'`
     );
+    if (mentorsResult.rows.length === 0) throw new Error("No mentors waiting.");
 
-    if (mentorResult.rows.length === 0) {
-      throw new Error("No compatible mentor available.");
+    // 3. Calculate overlap for each mentor
+    let bestMentor = null;
+    let maxOverlap = 0;
+
+    for (const mentor of mentorsResult.rows) {
+      // interests are arrays: calculate overlap count
+      const mentorInterests = mentor.interests;
+      const menteeInterests = mentee.interests;
+      // count shared interests
+      const overlap = mentorInterests.filter(i => menteeInterests.includes(i)).length;
+
+      if (overlap > maxOverlap) {
+        bestMentor = mentor;
+        maxOverlap = overlap;
+      } else if (overlap === maxOverlap && bestMentor && mentor.joined_at < bestMentor.joined_at) {
+        // tiebreaker: earliest joined mentor
+        bestMentor = mentor;
+      }
     }
 
-    const mentor = mentorResult.rows[0];
+    if (!bestMentor || maxOverlap === 0) throw new Error("No compatible mentor available.");
 
-    // 3. Create a new session
+    // 4. Create session
     const sessionId = uuidv4();
     const sessionLink = `/session/${sessionId}`;
-
     await client.query(
       `INSERT INTO sessions (id, mentor_id, mentee_id, session_link)
        VALUES ($1, $2, $3, $4)`,
-      [sessionId, mentor.user_id, mentee.user_id, sessionLink]
+      [sessionId, bestMentor.user_id, mentee.user_id, sessionLink]
     );
 
-    // 4. Remove both from the match_queue
+    // 5. Remove both from queue
     await client.query(
       `DELETE FROM match_queue WHERE id = $1 OR id = $2`,
-      [mentee.id, mentor.id]
+      [mentee.id, bestMentor.id]
     );
 
     await client.query("COMMIT");
 
     return {
+      matched: true,
       session_id: sessionId,
       session_link: sessionLink,
-      mentor_id: mentor.user_id,
-      mentee_id: mentee.user_id
+      mentor_id: bestMentor.user_id,
+      mentee_id: mentee.user_id,
+      overlap: maxOverlap,
     };
-
-  } catch (error) {
+  } catch (err) {
     await client.query("ROLLBACK");
-    throw error;
+    throw err;
   } finally {
     client.release();
   }

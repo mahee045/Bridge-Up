@@ -6,10 +6,10 @@ const cors = require("cors");
 app.use(cors());
 
 
-const { v4: uuidv4 } = require("uuid"); // For generating unique user IDs
+
 
 const db = require("./db");
-const { createUser } = require("./db/users"); 
+const { createUser, getUserById, getAllUsersByRole } = require("./db/users"); 
 const { findAndCreateMatch } = require("./db/match");
 const { getSessionDetails } = require("./db/sessions");
 const { submitFeedback } = require("./db/feedback");
@@ -38,7 +38,6 @@ app.post("/users", async (req, res) => {
     const { name, role, interests, bio } = req.body;
 
     const user = await createUser({
-      id: uuidv4(),
       name,
       role,
       interests,
@@ -52,34 +51,84 @@ app.post("/users", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
 
 //matching queue
 app.post("/match-queue", async (req, res) => {
   try {
+    console.log("MATCH QUEUE BODY:", req.body);
+
     const { user_id, role, interests } = req.body;
+    console.log("Attempting to insert to match_queue with:", { user_id, role, interests });
+
 
     const matchEntry = await addToMatchQueue({ user_id, role, interests });
 
     res.status(201).json(matchEntry);
   } catch (err) {
-    console.error(err);
+    console.error("Error in /match-queue:", err);
     res.status(500).json({ error: "Failed to add to match queue" });
   }
 });
 
+app.get("/match", async (req, res) => {
+  
+  const {userId} = req.query
+
+//step 1 : in order to find match, look in database for all the user and current user 
+try {
+  const currentUser = await getUserById(userId)
+  const role = currentUser.role === "mentor" ? "mentee" : "mentor"
+  const allUsers = await getAllUsersByRole(role)
+  console.log(currentUser)
+
+  //step 2: compare current user interests with all the users interests
+  const matches = allUsers.map(user =>{ 
+    for (const interest of user.interests) {
+      if (currentUser.interests.includes (interest)) {
+        return user
+      }
+    }
+  })
+  console.log(matches)
+//step 3: return back array with all matching users with same interests
+
+
+ res.json(matches)
+} catch(error) {
+  console.log (error) 
+  res.send("error")
+}
+//step 4 if counting matches are more than 3 its a mtch 
+})
+
 //find and create match
 app.post("/match", async (req, res) => {
+  console.log("MATCH QUEUE BODY:", req.body);
   try {
     const match = await findAndCreateMatch();
-    res.status(201).json(match);
+    // If a match is found, send details
+    res.status(200).json({
+      matched: true,
+      session_id: match.session_id,
+      mentor_id: match.mentor_id,
+      mentee_id: match.mentee_id,
+      session_link: match.session_link,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(404).json({ error: err.message });
+    // If NO match (e.g., "No compatible mentor available."), just say matched: false
+    if (
+      err.message &&
+      (err.message.includes("No mentees available") ||
+        err.message.includes("No compatible mentor available"))
+    ) {
+      res.status(200).json({ matched: false });
+    } else {
+      console.error(err);
+      res.status(500).json({ error: "Server error" });
+    }
   }
 });
+
 
 //route for session
 app.get("/session/:id", async (req, res) => {
@@ -164,4 +213,8 @@ app.get("/sessions", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch sessions" });
   }
+});
+
+app.listen(PORT, () => { //listener should be the last line in teh code
+  console.log(`Server listening on port ${PORT}`);
 });

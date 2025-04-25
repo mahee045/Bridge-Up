@@ -1,86 +1,134 @@
 import React, { useState } from "react";
-import { createUser, addToMatchQueue } from "../api/user";
-import { useNavigate } from "react-router-dom";
+import { createUser  } from "../api/user";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-///add word count, add drop down for interests, add potential social media handle coloum
+// List of interest options
+const INTEREST_OPTIONS = [
+  "Music/Singing",
+  "Writing/Blogging",
+  "Drawing/Painting",
+  "Photography",
+  "Acting/Theater",
+  "Programming/Coding",
+  "Math/Logic Puzzles",
+  "Robotics",
+  "Science/Research",
+  "Data Science/AI",
+  "Public Speaking",
+  "Volunteering/Community",
+  "Leadership/Student Council",
+  "Debate",
+  "Reading/Book Clubs",
+  "Language Learning",
+  "Sports (General)",
+  "Hiking/Outdoors",
+  "Cooking/Baking",
+  "Entrepreneurship/Startups"
+];
+
 function ProfileForm() {
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const [name, setName] = useState("");
-  const [interests, setInterests] = useState("");
   const [bio, setBio] = useState("");
+  const [selectedInterests, setSelectedInterests] = useState([]);
   const navigate = useNavigate();
+  const role = searchParams.get('role');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
 
-  const handleSubmit = () => {
-    const role = localStorage.getItem("userRole");
-  
-    if (!name.trim() || !interests.trim() || !bio.trim()) {
+    if (!name.trim() || selectedInterests.length === 0 || !bio.trim()) {
       alert("Please fill out all fields before submitting.");
       return;
     }
-  
-    const interestsArray = interests.split(",").map((i) => i.trim());
-  
+
     createUser({
       name,
       role,
-      interests: interestsArray,
-      bio
+      interests: selectedInterests,
+      bio,
     })
       .then((createdUser) => {
         console.log("✅ User inserted into DB:", createdUser);
   
-        return addToMatchQueue({
-          user_id: createdUser.id, // ✅ Now it exists!
-          role,
-          interests: interestsArray,
-        });
-      })
-      .then(() => {
         alert("Submitted successfully!");
-        // Optionally navigate to matching lobby here
+        navigate(`/matching-lobby?userId=${createdUser.id}`);
       })
       .catch((err) => {
         console.error("❌ Something went wrong:", err);
         alert("Something went wrong.");
       });
-
-      navigate("/matching-lobby"); //naviagete to the matching lobby
+    
+    
   };
 
   return (
     <div>
-      <h2> Tell us a bit about yourself </h2>
-      <div>
-  <label>Name</label>
-  <input
-    type="text"
-    placeholder="Enter your name"
-    value={name}
-    onChange={(e) => setName(e.target.value)}
-  />
-</div>
+      <h2>Tell us a bit about yourself {role}</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Name</label>
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
 
-<div>
-  <label>Interests</label>
-  <input
-    type="text"
-    placeholder="Enter your interests"
-    value={interests}
-    onChange={(e) => setInterests(e.target.value)}
-  />
-</div>
+        <div>
+          <label>Interests (select one or more):</label>
+          <select
+            multiple
+            value={selectedInterests}
+            onChange={(e) =>
+              setSelectedInterests(
+                Array.from(e.target.selectedOptions, (option) => option.value)
+              )
+            }
+            required
+            style={{
+              height: "160px",
+              width: "250px",
+              border: "1px solid #ccc",
+              padding: "8px",
+              fontSize: "14px",
+            }}
+          >
+            {INTEREST_OPTIONS.map((interest) => (
+              <option key={interest} value={interest}>
+                {interest}
+              </option>
+            ))}
+          </select>
+          <div style={{ marginTop: "10px" }}>
+            <strong>You selected:</strong>{" "}
+            {selectedInterests.length > 0 ? (
+              <ul>
+                {selectedInterests.map((i) => (
+                  <li key={i}>{i}</li>
+                ))}
+              </ul>
+            ) : (
+              "None yet"
+            )}
+          </div>
+        </div>
 
-<div>
-  <label>Bio</label>
-  <input
-    type="text"
-    placeholder="Enter a short bio and social media handles!"
-    value={bio}
-    onChange={(e) => setBio(e.target.value)}
-  />
-</div>
-<button onClick={handleSubmit}>Submit</button>
+        <div>
+          <label>Bio</label>
+          <input
+            type="text"
+            placeholder="Enter a short bio and social media handles!"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Submit</button>
+      </form>
     </div>
   );
 }
