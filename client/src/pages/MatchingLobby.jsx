@@ -73,6 +73,15 @@ try {
                   <li key={interest}>{interest}</li>
                 ))}
               </ul>
+              {/* Add the Join Chat Button */}
+              <button
+        onClick={() => {
+        // When clicked, navigate to the chat page
+        navigate(`/chat?userId=${userId}&partnerId=${match._id}`);
+              }}
+          >
+          Join Chat
+        </button>
             </div>
           ))}
         </div>

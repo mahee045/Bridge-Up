@@ -92,13 +92,13 @@ try {
   console.log(matches)
 //step 3: return back array with all matching users with same interests
 
-
+//step 4 if counting matches are more than 3 its a mtch
  res.json(matches)
 } catch(error) {
   console.log (error) 
   res.send("error")
 }
-//step 4 if counting matches are more than 3 its a mtch 
+
 })
 
 //find and create match
