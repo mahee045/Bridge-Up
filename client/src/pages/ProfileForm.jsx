@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { createUser  } from "../api/user";
+import { createUser } from "../api/user";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import "./ProfileForm.scss"; 
 
-// List of interest options
 const INTEREST_OPTIONS = [
   "Music/Singing",
   "Writing/Blogging",
@@ -23,20 +23,19 @@ const INTEREST_OPTIONS = [
   "Sports (General)",
   "Hiking/Outdoors",
   "Cooking/Baking",
-  "Entrepreneurship/Startups"
+  "Entrepreneurship/Startups",
 ];
 
 function ProfileForm() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [selectedInterests, setSelectedInterests] = useState([]);
   const navigate = useNavigate();
-  const role = searchParams.get('role');
+  const role = searchParams.get("role");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
 
     if (!name.trim() || selectedInterests.length === 0 || !bio.trim()) {
       alert("Please fill out all fields before submitting.");
@@ -51,7 +50,6 @@ function ProfileForm() {
     })
       .then((createdUser) => {
         console.log("✅ User inserted into DB:", createdUser);
-  
         alert("Submitted successfully!");
         navigate(`/matching-lobby?userId=${createdUser.id}`);
       })
@@ -59,8 +57,6 @@ function ProfileForm() {
         console.error("❌ Something went wrong:", err);
         alert("Something went wrong.");
       });
-    
-    
   };
 
   return (
@@ -89,13 +85,6 @@ function ProfileForm() {
               )
             }
             required
-            style={{
-              height: "160px",
-              width: "250px",
-              border: "1px solid #ccc",
-              padding: "8px",
-              fontSize: "14px",
-            }}
           >
             {INTEREST_OPTIONS.map((interest) => (
               <option key={interest} value={interest}>
@@ -103,7 +92,7 @@ function ProfileForm() {
               </option>
             ))}
           </select>
-          <div style={{ marginTop: "10px" }}>
+          <div>
             <strong>You selected:</strong>{" "}
             {selectedInterests.length > 0 ? (
               <ul>

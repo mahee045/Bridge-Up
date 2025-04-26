@@ -1,0 +1,99 @@
+.profile-form-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: linear-gradient(to bottom right, #f8fafc, #e0f2fe);
+    font-family: 'Helvetica Neue', sans-serif;
+  }
+  
+  form {
+    background: #ffffff;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    color: #334155;
+    margin-bottom: 2rem;
+  }
+  
+  form > div {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1e293b;
+    }
+  
+    input,
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: #f9fafb;
+      margin-top: 0.5rem;
+      font-family: inherit;
+    }
+  
+    select[multiple] {
+      height: 180px;
+    }
+  }
+  
+  button[type="submit"] {
+    margin-top: 1.5rem;
+    background-color: #f59e0b;
+    color: white;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  
+    &:hover {
+      background-color: #d97706;
+    }
+  }
+  
+  .selected-interests {
+    margin-top: 1rem;
+    text-align: left;
+  
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+  
+    .tag {
+      background-color: #e0f2fe;
+      color: #0284c7;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 20px;
+      display: inline-block;
+    }
+  
+    .no-selection {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+  }
+  
+  
