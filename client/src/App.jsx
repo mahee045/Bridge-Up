@@ -19,8 +19,7 @@ function App() {
         <Route path="/profile-form" element={<ProfileForm />} />
         <Route path="/matching-lobby" element={<MatchingLobby uuid={uuid} role={role} field={field}/>}/>
         <Route path="/chat" element={<ChatPage />} />
-        <Route path="/session" element={<Session />} />
-        <Route path="/feedback" element={<Feedback />} />
+
 
       </Routes>
     </Router>
