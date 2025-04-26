@@ -1,0 +1,17 @@
+.chat-messages {
+  border: 1px solid #b25b5b;
+  height: 200px;
+  overflow-y: auto;
+  margin: 20px 0;
+  padding: 10px;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-box {
+  flex: 1;
+  padding: 8px;
+}
