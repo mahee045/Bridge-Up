@@ -4,7 +4,8 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const cors = require("cors");
 app.use(cors());
-
+const http = require("http");
+const { Server } = require("socket.io");
 
 
 
@@ -15,6 +16,40 @@ const { getSessionDetails } = require("./db/sessions");
 const { submitFeedback } = require("./db/feedback");
 const { addToMatchQueue, removeFromMatchQueue } = require("./db/matchQueue");
 app.use(express.json());
+
+///ChatFUNCTION 
+
+//1. creating the http server
+const server = http.createServer(app);
+
+//2.Initialize Socket.IO with the server
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", //confirm port matches frontend
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  // 3. Listen for messages from the client
+  socket.on("send_message", (data) => {
+    // data can include: { room, sender, text }
+    io.to(data.room).emit("receive_message", data); // Send message to everyone in the room
+  });
+
+  // 4. Join a chat room (identified by a room name, e.g., user1-user2)
+  socket.on("join_room", (room) => {
+    socket.join(room);
+    console.log(`User joined room: ${room}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("A user disconnected:", socket.id);
+  });
+});
+
 
 // Home route
 app.get("/", (req, res) => {
@@ -215,6 +250,6 @@ app.get("/sessions", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => { //listener should be the last line in teh code
+server.listen(PORT, () => { //listener should be the last line in teh code
   console.log(`Server listening on port ${PORT}`);
 });

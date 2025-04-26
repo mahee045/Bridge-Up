@@ -64,7 +64,7 @@ try {
       ) : (
         <div>
           <h2>Here are your matches</h2>
-          {matches.map((match) => (
+          {matches.filter(Boolean).map((match) => (
             <div key={match.id}>
               <p>{match.name}</p>
               <p>Matching interests:</p>
@@ -77,7 +77,7 @@ try {
               <button
         onClick={() => {
         // When clicked, navigate to the chat page
-        navigate(`/chat?userId=${userId}&partnerId=${match._id}`);
+        navigate(`/chat?userId=${userId}&partnerId=${match.id}`);
               }}
           >
           Join Chat
