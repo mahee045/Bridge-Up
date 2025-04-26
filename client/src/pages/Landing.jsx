@@ -3,16 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import "./Landing.scss";
 import mentors from "../assets/mentors.png";
+import { useSearchParams } from "react-router-dom";
 
 
 function Landing() {
   const navigate = useNavigate();
 
+  // ONLY use query params and optionally a UUID for user ID
   const handleSelectRole = (role) => {
-    const uuid = uuidv4();
-    localStorage.setItem("userRole", role);
-    localStorage.setItem("userId", uuid);
-    navigate("/profile-form");
+    const uuid = uuidv4(); // You may want to use this in your next route!
+    
+    navigate(`/profile-form?role=${role}`);
   };
 
   return (
