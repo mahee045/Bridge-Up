@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
 import "./MatchingLobby.scss";
 
-export default function MatchingLobby({ uuid, role, field }) {
+export default function MatchingLobby() {
   const navigate = useNavigate();
   const [matches, setMatches] = useState([]);
   const [message, setMessage] = useState("Looking for a match…");
-  const [searchParams, setSearchParams] = useSearchParams(); 
+  const [searchParams] = useSearchParams();
+  const [selectedMatch, setSelectedMatch] = useState(null); // Modal control
   const userId = searchParams.get('userId');
+
   const tips = [
     "💬 Be ready to introduce yourself!",
     "🎯 Mention what you’re hoping to get out of the session!",
@@ -16,22 +17,17 @@ export default function MatchingLobby({ uuid, role, field }) {
   ];
 
   useEffect(() => {
-    setTimeout( async( )=> {
-try {
-        // POST to /match to check if there is a match
-        const res = await fetch(`http://localhost:3001/match?userId=${userId}`)
+    setTimeout(async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/match?userId=${userId}`);
         const data = await res.json();
-        setMessage ("Matches found")
-        setMatches (data)
-
+        setMessage("Matches found");
+        setMatches(data);
       } catch (err) {
         setMessage("Network error—check your server.");
       }
-    },3000)
-
-      
-   
-  }, [navigate]);
+    }, 3000);
+  }, [navigate, userId]);
 
   const handleCancel = () => {
     navigate("/");
@@ -62,32 +58,48 @@ try {
           </button>
         </>
       ) : (
-        <div>
-          <h2>Here are your matches</h2>
+        <div className="matches-list">
+          <h2 className="title">Your Matches</h2>
           {matches.filter(Boolean).map((match) => (
-            <div key={match.id}>
-              <p>{match.name}</p>
-              <p>Matching interests:</p>
-              <ul>
-                {match.interests.map((interest) => (
-                  <li key={interest}>{interest}</li>
-                ))}
-              </ul>
-              {/* Add the Join Chat Button */}
-              <button
-        onClick={() => {
-        // When clicked, navigate to the chat page
-        navigate(`/chat?userId=${userId}&partnerId=${match.id}`);
-              }}
-          >
-          Join Chat
-        </button>
+            <div key={match.id} className="match-card" onClick={() => setSelectedMatch(match)}>
+              <p><strong>{match.role === "mentor" ? "Mentor Name:" : "Mentee Name:"}</strong> {match.name}</p>
             </div>
           ))}
         </div>
       )}
+
+      {/* Modal Section */}
+      {selectedMatch && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>{selectedMatch.name}</h2>
+            <p><strong>Matching Interests:</strong></p>
+            <ul>
+              {selectedMatch.interests.map((interest) => (
+                <li key={interest}>{interest}</li>
+              ))}
+            </ul>
+            <p><strong>Bio:</strong> {selectedMatch.bio}</p>
+            <div className="modal-buttons">
+              <button
+                className="join-btn"
+                onClick={() => navigate(`/chat?userId=${userId}&partnerId=${selectedMatch.id}`)}
+              >
+                Join Chat
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setSelectedMatch(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-  }
-  
+}
+
+
 
