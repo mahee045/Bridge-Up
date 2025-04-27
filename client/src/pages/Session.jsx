@@ -1,20 +1,8 @@
-<<<<<<< Updated upstream
-// src/pages/Session.jsx
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-function Session() {
-  const navigate = useNavigate();
-
-  const endSession = () => {
-    // session data goes here
-    navigate("/feedback");
-=======
 //controls ChatPage + Feedback Modal
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ChatPage from "../pages/ChatPage";
-import Feedback from "../pages/feedback";
+import Feedback from "../pages/Feedback";
 
 function Session() {
   const navigate = useNavigate();
@@ -28,17 +16,10 @@ function Session() {
 
   const handleFeedbackSubmit = () => {
     navigate("/"); // Redirect to homepage after feedback
->>>>>>> Stashed changes
   };
 
   return (
     <div>
-<<<<<<< Updated upstream
-      <h2>Mentorship Session</h2>
-      <p>This is your dedicated session space. Discuss freely!</p>
-      {/* will include timer here later */}
-      <button onClick={endSession}>End Session</button>
-=======
       {!sessionEnded ? (
         <>
           <ChatPage />
@@ -47,7 +28,6 @@ function Session() {
       ) : (
         <Feedback sessionId={sessionId} onSubmit={handleFeedbackSubmit} />
       )}
->>>>>>> Stashed changes
     </div>
   );
 }

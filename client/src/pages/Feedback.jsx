@@ -1,12 +1,3 @@
-<<<<<<< Updated upstream
-import React, { useState } from "react";
-
-function Feedback() {
-  const [rating, setRating] = useState("");
-  const [comments, setComments] = useState("");
-
-  const handleSubmit = () => {
-=======
 import React, { useState, useEffect } from "react";
 
 function Feedback({ onSubmit, sessionId }) {
@@ -25,23 +16,11 @@ function Feedback({ onSubmit, sessionId }) {
   }, []);
 
   const handleSubmit = async () => {
->>>>>>> Stashed changes
     if (!rating || !comments.trim()) {
       alert("Please fill out all fields.");
       return;
     }
 
-<<<<<<< Updated upstream
-    console.log("📩 Feedback submitted:", { rating, comments });
-
-    // replace with api call
-    alert("Thanks for your feedback!");
-  };
-
-  return (
-    <div>
-      <h2>Session Feedback</h2>
-=======
     if (!fromUserId) {
       alert("User ID missing. Please log in again.");
       return;
@@ -83,7 +62,6 @@ function Feedback({ onSubmit, sessionId }) {
     <div className="feedback-page">
       <h2>Session Feedback</h2>
 
->>>>>>> Stashed changes
       <label>How was your session?</label>
       <select value={rating} onChange={(e) => setRating(e.target.value)}>
         <option value="">Select</option>
@@ -97,15 +75,6 @@ function Feedback({ onSubmit, sessionId }) {
       <div>
         <label>Additional Comments</label>
         <textarea
-<<<<<<< Updated upstream
-          placeholder="What went well? What can improve?"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-        />
-      </div>
-
-      <button onClick={handleSubmit}>Submit Feedback</button>
-=======
           placeholder="What went well? What could improve?"
           value={comments}
           onChange={(e) => setComments(e.target.value)}
@@ -116,7 +85,6 @@ function Feedback({ onSubmit, sessionId }) {
       <button onClick={handleSubmit} className="submit-btn">
         Submit Feedback
       </button>
->>>>>>> Stashed changes
     </div>
   );
 }
