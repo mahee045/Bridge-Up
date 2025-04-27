@@ -1,7 +1,8 @@
+//controls ChatPage + Feedback Modal
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ChatPage from "../pages/ChatPage";
-import Feedback from "../pages/feedback";
+import Feedback from "../pages/Feedback";
 
 function Session() {
   const navigate = useNavigate();

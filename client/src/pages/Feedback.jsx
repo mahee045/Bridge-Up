@@ -30,7 +30,7 @@ function Feedback({ onSubmit, sessionId }) {
       session_id: sessionId,
       rating: Number(rating),
       message: comments,
-      from_user_id: Number(fromUserId), // <-- will use dynamic ID here
+      from_user_id: Number(fromUserId), // <-- will use the dynamic ID here
     };
 
     console.log("📩 Submitting feedback:", feedbackData);
