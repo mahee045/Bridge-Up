@@ -1,17 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+.chat-page {
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  font-family: 'Nunito', sans-serif;
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+}
+
+.chat-page h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+}
+
+.chat-page p {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0.2rem 0;
+}
+
 .chat-messages {
-  border: 1px solid #b25b5b;
-  height: 200px;
+  width: 100%;
+  max-width: 700px;
+  flex: 1;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--color-highlight);
+  border-radius: 12px;
   overflow-y: auto;
-  margin: 20px 0;
-  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chat-message {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background-color: #fff;
+  max-width: 70%;
+  font-size: 1rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.chat-message strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+/* Differentiate own messages */
+.chat-message.you {
+  background-color: var(--color-button-primary);
+  color: white;
+  margin-left: auto;
+}
+
+/* Differentiate partner's messages */
+.chat-message.partner {
+  background-color: white;
+  color: var(--color-text-primary);
+  margin-right: auto;
+}
+
+.no-messages {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
 }
 
 .chat-input-row {
+  width: 100%;
+  max-width: 700px;
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  align-items: center;
 }
 
 .chat-input-box {
   flex: 1;
-  padding: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  outline: none;
+}
+
+.send-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-button-primary);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.send-btn:hover {
+  background-color: var(--color-button-hover);
 }
