@@ -14,29 +14,25 @@ const { submitFeedback } = require("./db/feedback");
 const { addToMatchQueue, removeFromMatchQueue, getAllFromMatchQueueByRole } = require("./db/matchQueue");
 app.use(express.json());
 
-///ChatFUNCTION 
-
-//1. creating the http server
+// Create the HTTP server
 const server = http.createServer(app);
 
-//2.Initialize Socket.IO with the server
+// Initialize Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", //confirm port matches frontend
+    origin: "http://localhost:5173", // Confirm port matches frontend
     methods: ["GET", "POST"],
   },
 });
 
+// Socket.IO logic
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  // 3. Listen for messages from the client
   socket.on("send_message", (data) => {
-    // data can include: { room, sender, text }
-    io.to(data.room).emit("receive_message", data); // Send message to everyone in the room
+    io.to(data.room).emit("receive_message", data);
   });
 
-  // 4. Join a chat room (identified by a room name, e.g., user1-user2)
   socket.on("join_room", (room) => {
     socket.join(room);
     console.log(`User joined room: ${room}`);
@@ -46,7 +42,6 @@ io.on("connection", (socket) => {
     console.log("A user disconnected:", socket.id);
   });
 });
-
 
 // Home route
 app.get("/", (req, res) => {
@@ -68,14 +63,7 @@ app.get("/test-db", async (req, res) => {
 app.post("/users", async (req, res) => {
   try {
     const { name, role, interests, bio } = req.body;
-
-    const user = await createUser({
-      name,
-      role,
-      interests,
-      bio,
-    });
-
+    const user = await createUser({ name, role, interests, bio });
     res.status(201).json(user);
   } catch (err) {
     console.error(err);
@@ -83,18 +71,12 @@ app.post("/users", async (req, res) => {
   }
 });
 
-
-//matching queue
+// Add user to matching queue
 app.post("/match-queue", async (req, res) => {
   try {
-    console.log("MATCH QUEUE BODY:", req.body);
-
     const { user_id, role, interests } = req.body;
     console.log("Attempting to insert to match_queue with:", { user_id, role, interests });
-
-
     const matchEntry = await addToMatchQueue({ user_id, role, interests });
-
     res.status(201).json(matchEntry);
   } catch (err) {
     console.error("Error in /match-queue:", err);
@@ -102,29 +84,27 @@ app.post("/match-queue", async (req, res) => {
   }
 });
 
+// Find matches
 app.get("/match", async (req, res) => {
   const { userId } = req.query;
   try {
     const currentUser = await getUserById(userId);
     const role = currentUser.role === "mentor" ? "mentee" : "mentor";
-    const allUsers = await getAllFromMatchQueueByRole(role); // <<< FIXED, so that it only gets matches that are active 
+    const allUsers = await getAllFromMatchQueueByRole(role);
     const matches = allUsers.filter(user =>
       user.interests.some(interest => currentUser.interests.includes(interest))
     );
     res.json(matches);
-  } catch(error) {
-    console.log (error) 
-    res.send("error")
+  } catch (error) {
+    console.log(error);
+    res.send("error");
   }
 });
 
-
-//find and create match
+// Find and create a match session
 app.post("/match", async (req, res) => {
-  console.log("MATCH QUEUE BODY:", req.body);
   try {
     const match = await findAndCreateMatch();
-    // If a match is found, send details
     res.status(200).json({
       matched: true,
       session_id: match.session_id,
@@ -133,7 +113,6 @@ app.post("/match", async (req, res) => {
       session_link: match.session_link,
     });
   } catch (err) {
-    // If NO match (e.g., "No compatible mentor available."), just say matched: false
     if (
       err.message &&
       (err.message.includes("No mentees available") ||
@@ -147,8 +126,7 @@ app.post("/match", async (req, res) => {
   }
 });
 
-
-//route for session
+// Get session details
 app.get("/session/:id", async (req, res) => {
   try {
     const sessionId = req.params.id;
@@ -165,16 +143,16 @@ app.get("/session/:id", async (req, res) => {
   }
 });
 
-//feedback route
+// Submit feedback
 app.post("/feedback", async (req, res) => {
   try {
-    const { session_id, from_user_id, message, rating } = req.body;
+    const { from_user_id, partner_user_id, message, rating } = req.body;
 
-    if (!session_id || !from_user_id || !rating) {
+    if (!from_user_id || !partner_user_id || !rating) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const feedback = await submitFeedback({ session_id, from_user_id, message, rating });
+    const feedback = await submitFeedback({ from_user_id, partner_user_id, message, rating });
 
     res.status(201).json(feedback);
   } catch (err) {
@@ -183,7 +161,8 @@ app.post("/feedback", async (req, res) => {
   }
 });
 
-//DELETE user if they have left the matching lobby 
+
+// Delete from match queue
 app.delete("/match-queue/:id", async (req, res) => {
   try {
     const queueId = req.params.id;
@@ -200,7 +179,7 @@ app.delete("/match-queue/:id", async (req, res) => {
   }
 });
 
-/// Get Route User
+// Get all users
 app.get("/users", async (req, res) => {
   try {
     const result = await db.query("SELECT * FROM users ORDER BY created_at DESC");
@@ -211,7 +190,7 @@ app.get("/users", async (req, res) => {
   }
 });
 
-//GET route for matching queue
+// Get all match queue entries
 app.get("/match-queue", async (req, res) => {
   try {
     const result = await db.query("SELECT * FROM match_queue ORDER BY joined_at ASC");
@@ -222,7 +201,7 @@ app.get("/match-queue", async (req, res) => {
   }
 });
 
-//GET ROUTE for sessions
+// Get all sessions
 app.get("/sessions", async (req, res) => {
   try {
     const result = await db.query("SELECT * FROM sessions ORDER BY started_at DESC");
@@ -233,6 +212,7 @@ app.get("/sessions", async (req, res) => {
   }
 });
 
-server.listen(PORT, () => { //listener should be the last line in teh code
+// Start the server
+server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

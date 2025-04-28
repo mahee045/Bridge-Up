@@ -24,10 +24,11 @@ export default function MatchingLobby() {
         setMessage("Matches found");
         setMatches(data);
       } catch (err) {
+        console.error(err);
         setMessage("Network error—check your server.");
       }
     }, 3000);
-  }, [navigate, userId]); // <-- keep both dependencies
+  }, [navigate, userId]);
 
   const handleCancel = () => {
     navigate("/");
@@ -79,7 +80,7 @@ export default function MatchingLobby() {
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // prevent opening modal if button is clicked
-                  navigate(`/chat?userId=${userId}&partnerId=${match.id}`);
+                  navigate(`/chat?userId=${userId}&partnerId=${match.user_id}`);
                 }}
               >
                 Join Chat

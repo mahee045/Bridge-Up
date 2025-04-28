@@ -1,11 +1,9 @@
-// server/db/match.js
-
-const db = require("./index"); 
+const db = require("./index");
 const { v4: uuidv4 } = require("uuid");
 
 // Find the mentee and the mentor with the most shared interests
 async function findAndCreateMatch() {
-  const client = await db.connect();///should not be there
+  const client = await db.connect();
   try {
     await client.query("BEGIN");
 
@@ -28,17 +26,14 @@ async function findAndCreateMatch() {
     let maxOverlap = 0;
 
     for (const mentor of mentorsResult.rows) {
-      // interests are arrays: calculate overlap count
       const mentorInterests = mentor.interests;
       const menteeInterests = mentee.interests;
-      // count shared interests
       const overlap = mentorInterests.filter(i => menteeInterests.includes(i)).length;
 
       if (overlap > maxOverlap) {
         bestMentor = mentor;
         maxOverlap = overlap;
       } else if (overlap === maxOverlap && bestMentor && mentor.joined_at < bestMentor.joined_at) {
-        // tiebreaker: earliest joined mentor
         bestMentor = mentor;
       }
     }

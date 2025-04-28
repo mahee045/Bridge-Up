@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate, useSearchParams } from "react-router-dom"; 
 import "./Feedback.scss";
 
-function Feedback({ sessionId }) {
+function Feedback() {
   const [rating, setRating] = useState("");
   const [comments, setComments] = useState("");
   const [fromUserId, setFromUserId] = useState(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // NEW
-  const navigate = useNavigate(); // NEW
+  const [partnerUserId, setPartnerUserId] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (userId) {
+    const userId = searchParams.get('from_user_id');
+    const partnerId = searchParams.get('partner_user_id');
+
+    if (userId && partnerId) {
       setFromUserId(userId);
+      setPartnerUserId(partnerId);
     } else {
-      console.error("⚠️ No userId found in localStorage");
+      console.error("⚠️ Missing userId or partnerId in URL");
     }
-  }, []);
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,16 +31,16 @@ function Feedback({ sessionId }) {
       return;
     }
 
-    if (!fromUserId) {
-      alert("User ID missing. Please log in again.");
+    if (!fromUserId || !partnerUserId) {
+      alert("User IDs missing. Please log in again.");
       return;
     }
 
     const feedbackData = {
-      session_id: sessionId,
-      rating: Number(rating),
+      from_user_id: fromUserId,
+      partner_user_id: partnerUserId,
       message: comments,
-      from_user_id: Number(fromUserId),
+      rating: Number(rating),
     };
 
     try {
@@ -48,7 +53,7 @@ function Feedback({ sessionId }) {
       });
 
       if (response.ok) {
-        setShowSuccessModal(true); 
+        setShowSuccessModal(true);
       } else {
         alert("Failed to submit feedback. Please try again.");
       }
@@ -60,7 +65,7 @@ function Feedback({ sessionId }) {
 
   const handleReturnHome = () => {
     setShowSuccessModal(false);
-    navigate("/"); // Navigate to Landing page
+    navigate("/");
   };
 
   return (
@@ -118,4 +123,3 @@ function Feedback({ sessionId }) {
 }
 
 export default Feedback;
-

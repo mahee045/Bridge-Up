@@ -71,7 +71,7 @@ export default function ChatPage() {
         console.error("Failed to remove from match queue", err);
       }
     }
-    navigate(`/feedback?from_user_id=${userId}`);
+    navigate(`/feedback?from_user_id=${userId}&partner_user_id=${partnerId}`);
   };
   
 
