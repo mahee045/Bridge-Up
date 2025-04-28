@@ -25,23 +25,38 @@ const io = new Server(server, {
   },
 });
 
-// Socket.IO logic
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
+
+  let userRoom = null;  // New
+
+  socket.on("join_room", (room) => {
+    socket.join(room);
+    userRoom = room;
+    console.log(`User joined room: ${room}`);
+
+    socket.to(room).emit("receive_message", {
+      text: "A user has joined the chat!",
+      system: true
+    });
+  });
 
   socket.on("send_message", (data) => {
     io.to(data.room).emit("receive_message", data);
   });
 
-  socket.on("join_room", (room) => {
-    socket.join(room);
-    console.log(`User joined room: ${room}`);
-  });
-
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
+
+    if (userRoom) {
+      socket.to(userRoom).emit("receive_message", {
+        text: "A user has left the chat.",
+        system: true
+      });
+    }
   });
 });
+
 
 // Home route
 app.get("/", (req, res) => {

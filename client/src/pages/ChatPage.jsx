@@ -63,6 +63,7 @@ export default function ChatPage() {
   //deleting user if they go to feedback form
   const handleEndSession = async () => {
     const queueId = localStorage.getItem("queueId");
+    
     if (queueId) {
       try {
         await removeFromMatchQueue(queueId);
@@ -71,6 +72,11 @@ export default function ChatPage() {
         console.error("Failed to remove from match queue", err);
       }
     }
+  
+    if (socketRef.current) {
+      socketRef.current.disconnect();  // <-- ✨ Disconnect manually before navigating
+    }
+  
     navigate(`/feedback?from_user_id=${userId}&partner_user_id=${partnerId}`);
   };
   
@@ -85,20 +91,27 @@ export default function ChatPage() {
 
       {/* Messages list */}
       <div className="chat-messages">
-        {messages.length === 0 ? (
-          <p className="no-messages">No messages yet.</p>
+  {messages.length === 0 ? (
+    <p className="no-messages">No messages yet.</p>
+  ) : (
+    messages.map((msg, idx) => (   // <-- no { here
+      <div
+        key={idx}
+        className={`chat-message ${msg.system ? "system" : (msg.sender === userId ? "you" : "partner")}`}
+      >
+        {msg.system ? (
+          <em>{msg.text}</em>
         ) : (
-          messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`chat-message ${msg.sender === userId ? "you" : "partner"}`}
-            >
-              <strong>{msg.sender === userId ? "You" : "Partner"}:</strong> {msg.text}
-            </div>
-          ))
+          <>
+            <strong>{msg.sender === userId ? "You" : "Partner"}:</strong> {msg.text}
+          </>
         )}
-        <div ref={messagesEndRef} />
       </div>
+    )) // 
+  )}
+  <div ref={messagesEndRef} />
+</div>
+
 
       {/* Message input box */}
       <div className="chat-input-row">
