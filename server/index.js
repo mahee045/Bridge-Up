@@ -6,15 +6,12 @@ const cors = require("cors");
 app.use(cors());
 const http = require("http");
 const { Server } = require("socket.io");
-
-
-
 const db = require("./db");
 const { createUser, getUserById, getAllUsersByRole } = require("./db/users"); 
 const { findAndCreateMatch } = require("./db/match");
 const { getSessionDetails } = require("./db/sessions");
 const { submitFeedback } = require("./db/feedback");
-const { addToMatchQueue, removeFromMatchQueue } = require("./db/matchQueue");
+const { addToMatchQueue, removeFromMatchQueue, getAllFromMatchQueueByRole } = require("./db/matchQueue");
 app.use(express.json());
 
 ///ChatFUNCTION 
@@ -106,31 +103,21 @@ app.post("/match-queue", async (req, res) => {
 });
 
 app.get("/match", async (req, res) => {
-  
-  const {userId} = req.query
+  const { userId } = req.query;
+  try {
+    const currentUser = await getUserById(userId);
+    const role = currentUser.role === "mentor" ? "mentee" : "mentor";
+    const allUsers = await getAllFromMatchQueueByRole(role); // <<< FIXED, so that it only gets matches that are active 
+    const matches = allUsers.filter(user =>
+      user.interests.some(interest => currentUser.interests.includes(interest))
+    );
+    res.json(matches);
+  } catch(error) {
+    console.log (error) 
+    res.send("error")
+  }
+});
 
-//step 1 : in order to find match, look in database for all the user and current user 
-try {
-  const currentUser = await getUserById(userId)
-  const role = currentUser.role === "mentor" ? "mentee" : "mentor"
-  const allUsers = await getAllUsersByRole(role)
-  console.log(currentUser)
-
-  //step 2: compare current user interests with all the users interests
-  const matches = allUsers.filter(user =>
-    user.interests.some(interest => currentUser.interests.includes(interest))
-  );
-  console.log(matches)
-//step 3: return back array with all matching users with same interests
-
-//step 4 if counting matches are more than 3 its a mtch
- res.json(matches)
-} catch(error) {
-  console.log (error) 
-  res.send("error")
-}
-
-})
 
 //find and create match
 app.post("/match", async (req, res) => {

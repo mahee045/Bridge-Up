@@ -16,21 +16,16 @@ export default function MatchingLobby({ uuid, role, field }) {
   ];
 
   useEffect(() => {
-    setTimeout( async( )=> {
-try {
-        // POST to /match to check if there is a match
+    setTimeout(async () => {
+      try {
         const res = await fetch(`http://localhost:3001/match?userId=${userId}`)
         const data = await res.json();
-        setMessage ("Matches found")
-        setMatches (data)
-
+        setMessage("Matches found")
+        setMatches(data)
       } catch (err) {
         setMessage("Network error—check your server.");
       }
-    },3000)
-
-      
-   
+    }, 3000)
   }, [navigate]);
 
   const handleCancel = () => {
@@ -64,29 +59,26 @@ try {
       ) : (
         <div>
           <h2>Here are your matches</h2>
-          {matches.filter(Boolean).map((match) => (
-            <div key={match.id}>
+          {matches.filter(Boolean).map((match, i) => (
+            <div key={match.id || `match-${i}`}>
               <p>{match.name}</p>
               <p>Matching interests:</p>
               <ul>
-                {match.interests.map((interest) => (
-                  <li key={interest}>{interest}</li>
+                {match.interests.map((interest, idx) => (
+                  <li key={`${interest}-${idx}`}>{interest}</li>
                 ))}
               </ul>
-              {/* Add the Join Chat Button */}
               <button
-        onClick={() => {
-        // When clicked, navigate to the chat page
-        navigate(`/chat?userId=${userId}&partnerId=${match.id}`);
-              }}
-          >
-          Join Chat
-        </button>
+                onClick={() => {
+                  navigate(`/chat?userId=${userId}&partnerId=${match.id}`);
+                }}
+              >
+                Join Chat
+              </button>
             </div>
           ))}
         </div>
       )}
     </div>
   );
-  }
-  
+}
