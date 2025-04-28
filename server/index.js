@@ -82,9 +82,9 @@ app.post("/users", async (req, res) => {
 // Add user to matching queue
 app.post("/match-queue", async (req, res) => {
   try {
-    const { user_id, role, interests } = req.body;
-    console.log("Attempting to insert to match_queue with:", { user_id, role, interests });
-    const matchEntry = await addToMatchQueue({ user_id, role, interests });
+    const { user_id, role, interests, bio } = req.body;
+    console.log("Attempting to insert to match_queue with:", { user_id, role, interests, bio });
+    const matchEntry = await addToMatchQueue({ user_id, role, interests, bio });
     res.status(201).json(matchEntry);
   } catch (err) {
     console.error("Error in /match-queue:", err);
@@ -104,10 +104,11 @@ app.get("/match", async (req, res) => {
     );
     res.json(matches);
   } catch (error) {
-    console.log(error);
-    res.send("error");
+    console.error(error);
+    res.status(500).json({ error: "Server error" }); // 🛠 FIXED to send JSON
   }
 });
+
 
 // Find and create a match session
 app.post("/match", async (req, res) => {

@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS match_queue (
   user_id UUID REFERENCES users(id),
   role TEXT CHECK (role IN ('mentor', 'mentee')),
   interests TEXT[],
+  bio TEXT,
   joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

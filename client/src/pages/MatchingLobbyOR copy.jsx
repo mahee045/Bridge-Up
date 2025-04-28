@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./MatchingLobby.scss";
+
 /////NOT THE REAL MATCHING LOBBY 
 export default function MatchingLobby({ uuid, role, field }) {
   const navigate = useNavigate();

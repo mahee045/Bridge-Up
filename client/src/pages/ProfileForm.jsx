@@ -49,10 +49,12 @@ import React, { useState } from "react";
     }
     createUser({ name, role, interests: selectedInterests.map(i => i.value), bio })
       .then((createdUser) => {
+        console.log("createdUser after /users:", createdUser);
         return addToMatchQueue({
           user_id: createdUser.id,
           role: createdUser.role,
           interests: createdUser.interests,
+          bio: createdUser.bio, 
         }).then(() => createdUser);
       })
       .then((createdUser) => {

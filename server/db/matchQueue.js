@@ -2,12 +2,12 @@
 const db = require("./index");
 
 // Add user to match queue
-async function addToMatchQueue({ user_id, role, interests }) {
+async function addToMatchQueue({ user_id, role, interests, bio }) {
   const result = await db.query(
-    `INSERT INTO match_queue (user_id, role, interests)
-     VALUES ($1, $2, $3)
+    `INSERT INTO match_queue (user_id, role, interests, bio)
+     VALUES ($1, $2, $3, $4)
      RETURNING *`, 
-    [user_id, role, interests]
+    [user_id, role, interests, bio]
   );
   return result.rows[0];
 }
@@ -29,7 +29,8 @@ async function getAllFromMatchQueueByRole(role) {
       users.id AS user_id,
       users.name,
       users.interests,
-      users.role
+      users.role,
+      match_queue.bio
     FROM match_queue
     JOIN users ON users.id = match_queue.user_id
     WHERE match_queue.role = $1
