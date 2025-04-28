@@ -1,5 +1,5 @@
 import React, { useState } from "react";
- import { createUser } from "../api/user";
+ import { createUser, addToMatchQueue } from "../api/user";
  import { useNavigate, useSearchParams } from "react-router-dom";
  import "./ProfileForm.scss"; 
  //select option in form importing react-select
@@ -42,30 +42,30 @@ import React, { useState } from "react";
    const role = searchParams.get("role");
  
    const handleSubmit = (e) => {
-     e.preventDefault();
- 
-     if (!name.trim() || selectedInterests.length === 0 || !bio.trim()) {
-       alert("Please fill out all fields before submitting.");
-       return;
-     }
- 
-     createUser({
-       name,
-       role,
-       interests: selectedInterests.map(i => i.value), 
-       bio,
-     })
-       .then((createdUser) => {
-         console.log("✅ User inserted into DB:", createdUser);
-         alert("Submitted successfully!");
-         navigate(`/matching-lobby?userId=${createdUser.id}`);
-       })
-       .catch((err) => {
-         console.error("❌ Something went wrong:", err);
-         alert("Something went wrong.");
-       });
-   };
- 
+    e.preventDefault();  // <- Always first!
+    if (!name.trim() || selectedInterests.length === 0 || !bio.trim()) {
+      alert("Please fill out all fields before submitting.");
+      return;
+    }
+    createUser({ name, role, interests: selectedInterests.map(i => i.value), bio })
+      .then((createdUser) => {
+        return addToMatchQueue({
+          user_id: createdUser.id,
+          role: createdUser.role,
+          interests: createdUser.interests,
+        }).then(() => createdUser);
+      })
+      .then((createdUser) => {
+        console.log("✅ User inserted and added to match queue:", createdUser);
+        alert("Submitted successfully!");
+        navigate(`/matching-lobby?userId=${createdUser.id}`);
+      })
+      .catch((err) => {
+        console.error("❌ Something went wrong:", err);
+        alert("Something went wrong.");
+      });
+  };
+  
    return (
      <div>
        <h2>Tell us a bit about yourself {role}</h2>
