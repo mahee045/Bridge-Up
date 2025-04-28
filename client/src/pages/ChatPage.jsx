@@ -49,14 +49,17 @@ export default function ChatPage() {
 
   const handleSend = () => {
     if (input.trim() === "") return;
-
+  
     const room = getRoomName(userId, partnerId);
-    const messageData = { room, sender: userId, text: input };
-
+    const messageData = { 
+      room, 
+      sender: userId, 
+      text: input,
+      timestamp: Date.now(),  // timestamp when sending
+    };
+  
     socketRef.current.emit("send_message", messageData);
-
-    //setMessages((prev) => [...prev, { sender: userId, text: input }]);
-
+  
     setInput("");
   };
 
@@ -80,6 +83,15 @@ export default function ChatPage() {
     navigate(`/feedback?from_user_id=${userId}&partner_user_id=${partnerId}`);
   };
   
+  //time stamp function
+  function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedTime = `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")} ${hours >= 12 ? "PM" : "AM"}`;
+    return formattedTime;
+  }
+  
 
   return (
     <div className="chat-page">
@@ -94,7 +106,7 @@ export default function ChatPage() {
   {messages.length === 0 ? (
     <p className="no-messages">No messages yet.</p>
   ) : (
-    messages.map((msg, idx) => (   // <-- no { here
+    messages.map((msg, idx) => (
       <div
         key={idx}
         className={`chat-message ${msg.system ? "system" : (msg.sender === userId ? "you" : "partner")}`}
@@ -104,10 +116,14 @@ export default function ChatPage() {
         ) : (
           <>
             <strong>{msg.sender === userId ? "You" : "Partner"}:</strong> {msg.text}
+            {/* Add the timestamp display here */}
+            <div className="timestamp">
+              {msg.timestamp && formatTimestamp(msg.timestamp)}
+            </div>
           </>
         )}
       </div>
-    )) // 
+    ))
   )}
   <div ref={messagesEndRef} />
 </div>

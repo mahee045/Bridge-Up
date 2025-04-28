@@ -28,17 +28,13 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  let userRoom = null;  // New
-
   socket.on("join_room", (room) => {
     socket.join(room);
-    userRoom = room;
+    socket.room = room;  // 🛠 Save the room name for later
     console.log(`User joined room: ${room}`);
-
-    socket.to(room).emit("receive_message", {
-      text: "A user has joined the chat!",
-      system: true
-    });
+    
+    // Notify others a user joined
+    socket.to(room).emit("receive_message", { text: "A user has joined the chat!", system: true });
   });
 
   socket.on("send_message", (data) => {
@@ -48,15 +44,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
 
-    if (userRoom) {
-      socket.to(userRoom).emit("receive_message", {
-        text: "A user has left the chat.",
-        system: true
-      });
+    // 🔥 Use the saved room when user disconnects
+    if (socket.room) {
+      socket.to(socket.room).emit("receive_message", { text: "A user has left the chat!", system: true });
     }
   });
 });
-
 
 // Home route
 app.get("/", (req, res) => {
