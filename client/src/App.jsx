@@ -5,6 +5,8 @@ import MatchingLobby from "./pages/MatchingLobby";
 import ChatPage from "./pages/ChatPage"; 
 import Feedback from "./pages/Feedback";
 import Session from "./pages/Session";
+import Navbar from "./pages/Navbar";
+
 
 // You can remove either Landing or Home if you only use one for "/"
 function App() {
@@ -15,6 +17,7 @@ function App() {
 
   return (
     <Router>
+       <Navbar />
       <Routes>
         {/* You can use Landing or Home, or both depending on your preference */}
         <Route path="/" element={<Landing />} />
@@ -27,5 +30,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;
