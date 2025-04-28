@@ -1,8 +1,9 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { useState, useEffect, useRef } from "react";
 import "./ChatPage.scss"; 
+import { removeFromMatchQueue } from "../api/user"; 
 
 export default function ChatPage() {
   const [searchParams] = useSearchParams();
@@ -12,6 +13,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const socketRef = useRef(null);
+  const navigate = useNavigate();
 
   // Generate a unique room name for two users
   function getRoomName(id1, id2) {
@@ -39,6 +41,21 @@ export default function ChatPage() {
     socketRef.current.emit("send_message", messageData);
     setInput("");
   };
+
+  //deleting user if they go to feedback form
+  const handleEndSession = async () => {
+    const queueId = localStorage.getItem("queueId");
+    if (queueId) {
+      try {
+        await removeFromMatchQueue(queueId);
+        localStorage.removeItem("queueId");
+      } catch (err) {
+        console.error("Failed to remove from match queue", err);
+      }
+    }
+    navigate(`/feedback?from_user_id=${userId}`);
+  };
+  
 
   return (
     <div className="chat-page">
@@ -70,9 +87,18 @@ export default function ChatPage() {
         />
         <button onClick={handleSend} className="send-btn">Send</button>
       </div>
+      <button 
+  onClick={handleEndSession}
+  style={{ marginTop: "20px", padding: "0.7em 2em", borderRadius: "8px", background: "#f59e0b", color: "#fff", fontWeight: 600, cursor: "pointer" }}
+>
+  End Session
+</button>
     </div>
   );
 }
+
+
+
 
 
 

@@ -33,7 +33,18 @@ try {
    
   }, [navigate]);
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
+    const queueId = localStorage.getItem("queueId");
+    console.log("Trying to remove queueId:", queueId);
+    if (queueId) {
+      try {
+        await fetch(`http://localhost:3001/match-queue/${queueId}`, { method: "DELETE" });
+        localStorage.removeItem("queueId"); // Clean up!
+      } catch (err) {
+        // Optional: You could alert the user if something goes wrong
+        console.error("Failed to remove from match queue", err);
+      }
+    }
     navigate("/");
   };
 

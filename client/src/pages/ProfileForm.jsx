@@ -1,13 +1,9 @@
 import React, { useState } from "react";
-import { createUser } from "../api/user";
+import { createUser, addToMatchQueue } from "../api/user";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./ProfileForm.scss"; 
 //select option in form importing react-select
 import Select from 'react-select';
-
-
-
-
 
 const INTEREST_OPTIONS = [
   "Music/Singing",
@@ -45,7 +41,7 @@ function ProfileForm() {
   const navigate = useNavigate();
   const role = searchParams.get("role");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!name.trim() || selectedInterests.length === 0 || !bio.trim()) {
@@ -53,21 +49,30 @@ function ProfileForm() {
       return;
     }
 
-    createUser({
-      name,
-      role,
-      interests: selectedInterests.map(i => i.value), 
-      bio,
-    })
-      .then((createdUser) => {
-        console.log("✅ User inserted into DB:", createdUser);
-        alert("Submitted successfully!");
-        navigate(`/matching-lobby?userId=${createdUser.id}`);
-      })
-      .catch((err) => {
-        console.error("❌ Something went wrong:", err);
-        alert("Something went wrong.");
+    try {
+      // 1. Create user using API function
+      const createdUser = await createUser({
+        name,
+        role,
+        interests: selectedInterests.map(i => i.value), 
+        bio,
       });
+
+      // 2. Add to match queue using API function
+      const queueData = await addToMatchQueue({
+        user_id: createdUser.id,
+        role: role,
+        interests: selectedInterests.map(i => i.value)
+      });
+      console.log("QUEUE DATA RETURNED:", queueData); // See what .id is here!
+      localStorage.setItem("queueId", queueData.id);
+
+      alert("Submitted successfully!");
+      navigate(`/matching-lobby?userId=${createdUser.id}`);
+    } catch (err) {
+      console.error("❌ Something went wrong:", err);
+      alert("Something went wrong.");
+    }
   };
 
   return (
@@ -125,5 +130,4 @@ function ProfileForm() {
     </div>
   );
 }
-
 export default ProfileForm;

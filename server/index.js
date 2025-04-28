@@ -14,8 +14,9 @@ const { createUser, getUserById, getAllUsersByRole } = require("./db/users");
 const { findAndCreateMatch } = require("./db/match");
 const { getSessionDetails } = require("./db/sessions");
 const { submitFeedback } = require("./db/feedback");
-const { addToMatchQueue, removeFromMatchQueue } = require("./db/matchQueue");
+const { addToMatchQueue, removeFromMatchQueue, getAllFromMatchQueueByRole } = require('./db/matchQueue');
 app.use(express.json());
+
 
 ///ChatFUNCTION 
 
@@ -88,53 +89,25 @@ app.post("/users", async (req, res) => {
 
 
 //matching queue
-app.post("/match-queue", async (req, res) => {
+app.get("/match", async (req, res) => {
+  const { userId } = req.query;
   try {
-    console.log("MATCH QUEUE BODY:", req.body);
+    const currentUser = await getUserById(userId);
+    const role = currentUser.role === "mentor" ? "mentee" : "mentor";
+    const allUsers = await getAllFromMatchQueueByRole(role);
 
-    const { user_id, role, interests } = req.body;
-    console.log("Attempting to insert to match_queue with:", { user_id, role, interests });
+    // Now allUsers has .name and .interests!
+    // ...your matching logic (filtering by interests etc)...
+    const matches = allUsers.filter(user => {
+      return user.interests.some(interest => currentUser.interests.includes(interest));
+    });
 
-
-    const matchEntry = await addToMatchQueue({ user_id, role, interests });
-
-    res.status(201).json(matchEntry);
+    res.json(matches);
   } catch (err) {
-    console.error("Error in /match-queue:", err);
-    res.status(500).json({ error: "Failed to add to match queue" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-app.get("/match", async (req, res) => {
-  
-  const {userId} = req.query
-
-//step 1 : in order to find match, look in database for all the user and current user 
-try {
-  const currentUser = await getUserById(userId)
-  const role = currentUser.role === "mentor" ? "mentee" : "mentor"
-  const allUsers = await getAllUsersByRole(role)
-  console.log(currentUser)
-
-  //step 2: compare current user interests with all the users interests
-  const matches = allUsers.map(user =>{ 
-    for (const interest of user.interests) {
-      if (currentUser.interests.includes (interest)) {
-        return user
-      }
-    }
-  })
-  console.log(matches)
-//step 3: return back array with all matching users with same interests
-
-//step 4 if counting matches are more than 3 its a mtch
- res.json(matches)
-} catch(error) {
-  console.log (error) 
-  res.send("error")
-}
-
-})
 
 //find and create match
 app.post("/match", async (req, res) => {
@@ -238,6 +211,19 @@ app.get("/match-queue", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch match queue" });
   }
 });
+
+//post route 
+app.post("/match-queue", async (req, res) => {
+  try {
+    const { user_id, role, interests } = req.body;
+    const matchEntry = await addToMatchQueue({ user_id, role, interests });
+    res.status(201).json(matchEntry);
+  } catch (err) {
+    console.error("Error in /match-queue:", err);
+    res.status(500).json({ error: "Failed to add to match queue" });
+  }
+});
+
 
 //GET ROUTE for sessions
 app.get("/sessions", async (req, res) => {
