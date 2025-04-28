@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { createUser } from "../api/user";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./ProfileForm.scss"; 
+//select option in form importing react-select
+import Select from 'react-select';
+
+
+
+
 
 const INTEREST_OPTIONS = [
   "Music/Singing",
@@ -26,6 +32,11 @@ const INTEREST_OPTIONS = [
   "Entrepreneurship/Startups",
 ];
 
+//react-select options
+const INTEREST_OPTIONS_OBJ = INTEREST_OPTIONS.map(option => ({
+  value: option,
+  label: option
+}));
 function ProfileForm() {
   const [searchParams] = useSearchParams();
   const [name, setName] = useState("");
@@ -45,7 +56,7 @@ function ProfileForm() {
     createUser({
       name,
       role,
-      interests: selectedInterests,
+      interests: selectedInterests.map(i => i.value), 
       bio,
     })
       .then((createdUser) => {
@@ -75,36 +86,29 @@ function ProfileForm() {
         </div>
 
         <div>
-          <label>Interests (select one or more):</label>
-          <select
-            multiple
-            value={selectedInterests}
-            onChange={(e) =>
-              setSelectedInterests(
-                Array.from(e.target.selectedOptions, (option) => option.value)
-              )
-            }
-            required
-          >
-            {INTEREST_OPTIONS.map((interest) => (
-              <option key={interest} value={interest}>
-                {interest}
-              </option>
-            ))}
-          </select>
-          <div>
-            <strong>You selected:</strong>{" "}
-            {selectedInterests.length > 0 ? (
-              <ul>
-                {selectedInterests.map((i) => (
-                  <li key={i}>{i}</li>
-                ))}
-              </ul>
-            ) : (
-              "None yet"
-            )}
-          </div>
-        </div>
+  <label>Interests (select one or more):</label>
+  <Select
+    isMulti
+    options={INTEREST_OPTIONS_OBJ}
+    value={selectedInterests}
+    onChange={setSelectedInterests}
+    className="interest-select"
+    classNamePrefix="interest"
+    placeholder="Select interests..."
+  />
+  <div>
+    <strong>You selected:</strong>{" "}
+    {selectedInterests.length > 0 ? (
+      <ul>
+        {selectedInterests.map((i) => (
+          <li key={i.value}>{i.label}</li>
+        ))}
+      </ul>
+    ) : (
+      "None yet"
+    )}
+  </div>
+</div>
 
         <div>
           <label>Bio</label>

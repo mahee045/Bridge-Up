@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
+import "./Feedback.scss";
 
-function Feedback({ onSubmit, sessionId }) {
+function Feedback({ sessionId }) {
   const [rating, setRating] = useState("");
   const [comments, setComments] = useState("");
-  const [fromUserId, setFromUserId] = useState(null); // <-- NEW
+  const [fromUserId, setFromUserId] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // NEW
+  const navigate = useNavigate(); // NEW
 
   useEffect(() => {
-    // Pull user ID from localStorage when component loads
     const userId = localStorage.getItem("userId");
     if (userId) {
       setFromUserId(userId);
@@ -15,7 +18,9 @@ function Feedback({ onSubmit, sessionId }) {
     }
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (!rating || !comments.trim()) {
       alert("Please fill out all fields.");
       return;
@@ -30,10 +35,8 @@ function Feedback({ onSubmit, sessionId }) {
       session_id: sessionId,
       rating: Number(rating),
       message: comments,
-      from_user_id: Number(fromUserId), // <-- will use dynamic ID here
+      from_user_id: Number(fromUserId),
     };
-
-    console.log("📩 Submitting feedback:", feedbackData);
 
     try {
       const response = await fetch("http://localhost:3001/feedback", {
@@ -45,10 +48,7 @@ function Feedback({ onSubmit, sessionId }) {
       });
 
       if (response.ok) {
-        alert("Thanks for your feedback!");
-        if (onSubmit) {
-          onSubmit(); // Go back or move to next step
-        }
+        setShowSuccessModal(true); 
       } else {
         alert("Failed to submit feedback. Please try again.");
       }
@@ -58,35 +58,64 @@ function Feedback({ onSubmit, sessionId }) {
     }
   };
 
+  const handleReturnHome = () => {
+    setShowSuccessModal(false);
+    navigate("/"); // Navigate to Landing page
+  };
+
   return (
     <div className="feedback-page">
       <h2>Session Feedback</h2>
 
-      <label>How was your session?</label>
-      <select value={rating} onChange={(e) => setRating(e.target.value)}>
-        <option value="">Select</option>
-        <option value="5">🌟 Excellent</option>
-        <option value="4">👍 Good</option>
-        <option value="3">🙂 Okay</option>
-        <option value="2">😕 Meh</option>
-        <option value="1">👎 Poor</option>
-      </select>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="rating">How was your session?</label>
+          <select
+            id="rating"
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
+            required
+          >
+            <option value="">Select</option>
+            <option value="5">🌟 Excellent</option>
+            <option value="4">👍 Good</option>
+            <option value="3">🙂 Okay</option>
+            <option value="2">😕 Meh</option>
+            <option value="1">👎 Poor</option>
+          </select>
+        </div>
 
-      <div>
-        <label>Additional Comments</label>
-        <textarea
-          placeholder="What went well? What could improve?"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          rows={4}
-        />
-      </div>
+        <div>
+          <label htmlFor="comments">Additional Comments</label>
+          <textarea
+            id="comments"
+            placeholder="What went well? What could improve?"
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+            rows={4}
+            required
+          />
+        </div>
 
-      <button onClick={handleSubmit} className="submit-btn">
-        Submit Feedback
-      </button>
+        <button type="submit" className="submit-btn">
+          Submit Feedback
+        </button>
+      </form>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="success-modal-overlay">
+          <div className="success-modal">
+            <h3>Thank you for your feedback!</h3>
+            <button onClick={handleReturnHome} className="return-home-btn">
+              Return to Home
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default Feedback;
+
