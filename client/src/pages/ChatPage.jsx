@@ -1,28 +1,34 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { useState, useEffect, useRef } from "react";
-import "./ChatPage.scss"; 
-import { removeFromMatchQueue } from "../api/user"; 
+import "./ChatPage.scss";
+import { removeFromMatchQueue } from "../api/user";
 
 export default function ChatPage() {
   const [searchParams] = useSearchParams();
-  const userId = searchParams.get("userId");
-  const partnerId = searchParams.get("partnerId");
-
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const socketRef = useRef(null);
   const navigate = useNavigate();
+  const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
 
+  // Extract relevant URL parameters: IDs and user names
+  const userId = searchParams.get("userId");
+  const partnerId = searchParams.get("partnerId");
+  const userName = searchParams.get("userName");
+  const partnerName = searchParams.get("partnerName");
+
+  // Local state for message list and input field
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+
+  // Helper function to determine consistent room naming convention
   function getRoomName(id1, id2) {
     return [id1, id2].sort().join("-");
   }
 
+  // Establish socket connection and manage message listening
   useEffect(() => {
     if (!userId || !partnerId) {
-      console.error("Missing userId or partnerId");
+      console.error("Missing userId or partnerId. Cannot establish room.");
       return;
     }
 
@@ -36,34 +42,37 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, data]);
     });
 
+    // Cleanup connection on component unmount
     return () => {
       socketRef.current.disconnect();
     };
   }, [userId, partnerId]);
 
+  // Ensure chat scrolls automatically to the latest message
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
+  // Handle sending new message
   const handleSend = () => {
-    if (input.trim() === "") return;
-  
+    if (input.trim() === "") return; // Prevent empty messages
+
     const room = getRoomName(userId, partnerId);
-    const messageData = { 
-      room, 
-      sender: userId, 
+
+    const messageData = {
+      room,
+      sender: userId,
       text: input,
-      timestamp: Date.now(),  // timestamp when sending
+      timestamp: Date.now(),
     };
-  
+
     socketRef.current.emit("send_message", messageData);
-  
     setInput("");
   };
 
-  //deleting user if they go to feedback form
+  // Manage ending session and cleaning up queue participation
   const handleEndSession = async () => {
     const queueId = localStorage.getItem("queueId");
     if (queueId) {
@@ -76,8 +85,8 @@ export default function ChatPage() {
     }
     navigate(`/feedback?from_user_id=${userId}&partner_user_id=${partnerId}`);
   };
-  
-  //time stamp function
+
+  // Format timestamps for human-readable chat bubbles
   function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
     const hours = date.getHours();
@@ -85,45 +94,46 @@ export default function ChatPage() {
     const formattedTime = `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")} ${hours >= 12 ? "PM" : "AM"}`;
     return formattedTime;
   }
-  
 
   return (
     <div className="chat-page">
       <h2>Chat Room</h2>
+
+      {/* Display usernames instead of system IDs */}
       <div>
-        <p><strong>Your User ID:</strong> {userId}</p>
-        <p><strong>Partner's User ID:</strong> {partnerId}</p>
+        <p><strong>Mentor:</strong> {userName}</p>
+        <p><strong>Mentee:</strong> {partnerName}</p>
       </div>
 
-      {/* Messages list */}
+      {/* Message history list */}
       <div className="chat-messages">
-  {messages.length === 0 ? (
-    <p className="no-messages">No messages yet.</p>
-  ) : (
-    messages.map((msg, idx) => (
-      <div
-        key={idx}
-        className={`chat-message ${msg.system ? "system" : (msg.sender === userId ? "you" : "partner")}`}
-      >
-        {msg.system ? (
-          <em>{msg.text}</em>
+        {messages.length === 0 ? (
+          <p className="no-messages">No messages yet.</p>
         ) : (
-          <>
-            <strong>{msg.sender === userId ? "You" : "Partner"}:</strong> {msg.text}
-            {/* Add the timestamp display here */}
-            <div className="timestamp">
-              {msg.timestamp && formatTimestamp(msg.timestamp)}
+          messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`chat-message ${msg.system ? "system" : (msg.sender === userId ? "you" : "partner")}`}
+            >
+              {/* System messages vs. user-generated content */}
+              {msg.system ? (
+                <em>{msg.text}</em>
+              ) : (
+                <>
+                  <strong>{msg.sender === userId ? "You" : partnerName}:</strong> {msg.text}
+                  <div className="timestamp">
+                    {msg.timestamp && formatTimestamp(msg.timestamp)}
+                  </div>
+                </>
+              )}
             </div>
-          </>
+          ))
         )}
+        {/* Reference to keep scroll at bottom */}
+        <div ref={messagesEndRef} />
       </div>
-    ))
-  )}
-  <div ref={messagesEndRef} />
-</div>
 
-
-      {/* Message input box */}
+      {/* Input field and send button */}
       <div className="chat-input-row">
         <input
           type="text"
@@ -139,18 +149,22 @@ export default function ChatPage() {
           Send
         </button>
       </div>
-      <button 
-  onClick={handleEndSession}
-  style={{ marginTop: "20px", padding: "0.7em 2em", borderRadius: "8px", background: "#f59e0b", color: "#fff", fontWeight: 600, cursor: "pointer" }}
->
-  End Session
-</button>
+
+      {/* End session button */}
+      <button
+        onClick={handleEndSession}
+        style={{
+          marginTop: "20px",
+          padding: "0.7em 2em",
+          borderRadius: "8px",
+          background: "#f59e0b",
+          color: "#fff",
+          fontWeight: 600,
+          cursor: "pointer",
+        }}
+      >
+        End Session
+      </button>
     </div>
   );
 }
-
-
-
-
-
-
