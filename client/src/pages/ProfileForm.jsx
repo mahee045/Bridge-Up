@@ -70,7 +70,7 @@ import React, { useState } from "react";
   
    return (
      <div>
-       <h2>Tell us a bit about yourself {role}</h2>
+       <h2>Tell us a bit about yourself{role}</h2>
        <form onSubmit={handleSubmit}>
          <div>
            <label>Name</label>
