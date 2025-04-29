@@ -48,15 +48,18 @@ import React, { useState } from "react";
       return;
     }
     createUser({ name, role, interests: selectedInterests.map(i => i.value), bio })
-      .then((createdUser) => {
-        console.log("createdUser after /users:", createdUser);
-        return addToMatchQueue({
-          user_id: createdUser.id,
-          role: createdUser.role,
-          interests: createdUser.interests,
-          bio: createdUser.bio, 
-        }).then(() => createdUser);
-      })
+  .then((createdUser) => {
+    console.log("createdUser after /users:", createdUser);
+    return addToMatchQueue({
+      user_id: createdUser.id,
+      role: createdUser.role,
+      interests: createdUser.interests,
+      bio: createdUser.bio, 
+    }).then((matchQueueEntry) => {
+      localStorage.setItem("queueId", matchQueueEntry.id); 
+      return createdUser;
+    });
+  })
       .then((createdUser) => {
         console.log("✅ User inserted and added to match queue:", createdUser);
         alert("Submitted successfully!");
@@ -70,7 +73,7 @@ import React, { useState } from "react";
   
    return (
      <div>
-       <h2>Tell us a bit about yourself{role}</h2>
+       <h2>Tell us a bit about yourself {role}</h2>
        <form onSubmit={handleSubmit}>
          <div>
            <label>Name</label>

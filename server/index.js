@@ -30,24 +30,35 @@ io.on("connection", (socket) => {
 
   socket.on("join_room", (room) => {
     socket.join(room);
-    socket.room = room;  // 🛠 Save the room name for later
+    socket.room = room;  
     console.log(`User joined room: ${room}`);
-    
+
     // Notify others a user joined
-    socket.to(room).emit("receive_message", { text: "A user has joined the chat!", system: true });
+    socket.to(room).emit("receive_message", { 
+      text: "A user has joined the chat!", 
+      system: true 
+    });
   });
 
   socket.on("send_message", (data) => {
     io.to(data.room).emit("receive_message", data);
   });
 
+  // use "disconnecting" instead of "disconnect"
+  socket.on("disconnecting", () => {
+    console.log("A user is disconnecting:", socket.id);
+
+    if (socket.room) {
+      socket.to(socket.room).emit("receive_message", {
+        text: "A user has left the chat!",
+        system: true,
+      });
+    }
+  });
+
+  // Still good to keep "disconnect" just for logging
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
-
-    // 🔥 Use the saved room when user disconnects
-    if (socket.room) {
-      socket.to(socket.room).emit("receive_message", { text: "A user has left the chat!", system: true });
-    }
   });
 });
 

@@ -66,7 +66,6 @@ export default function ChatPage() {
   //deleting user if they go to feedback form
   const handleEndSession = async () => {
     const queueId = localStorage.getItem("queueId");
-    
     if (queueId) {
       try {
         await removeFromMatchQueue(queueId);
@@ -75,11 +74,6 @@ export default function ChatPage() {
         console.error("Failed to remove from match queue", err);
       }
     }
-  
-    if (socketRef.current) {
-      socketRef.current.disconnect();  // <-- ✨ Disconnect manually before navigating
-    }
-  
     navigate(`/feedback?from_user_id=${userId}&partner_user_id=${partnerId}`);
   };
   

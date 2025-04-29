@@ -30,9 +30,21 @@ export default function MatchingLobby() {
     }, 3000);
   }, [navigate, userId]);
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
+    const queueId = localStorage.getItem("queueId");
+    if (queueId) {
+      try {
+        await fetch(`http://localhost:3001/match-queue/${queueId}`, {
+          method: "DELETE",
+        });
+        localStorage.removeItem("queueId");
+      } catch (error) {
+        console.error("Failed to remove user from queue:", error);
+      }
+    }
     navigate("/");
   };
+  
 
   return (
     <div className="matching-lobby">
@@ -105,7 +117,7 @@ export default function MatchingLobby() {
             <div className="modal-buttons">
               <button
                 className="join-btn"
-                onClick={() => navigate(`/chat?userId=${userId}&partnerId=${selectedMatch.id}`)}
+                onClick={() => navigate(`/chat?userId=${userId}&partnerId=${selectedMatch.user_id}`)}
               >
                 Join Chat
               </button>

@@ -5,7 +5,7 @@ import MatchingLobby from "./pages/MatchingLobby";
 import ChatPage from "./pages/ChatPage"; 
 import Feedback from "./pages/Feedback";
 import Session from "./pages/Session";
-import Navbar from "./pages/Navbar";
+import Navbar from "./pages/NavBar";
 
 
 // You can remove either Landing or Home if you only use one for "/"

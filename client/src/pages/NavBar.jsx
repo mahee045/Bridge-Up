@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./Navbar.scss";
+import "./NavBar.scss";
 import BridgeLogo from "../assets/BridgeLogo.png"; 
 
 function Navbar() {

@@ -30,3 +30,4 @@ export const removeFromMatchQueue = async (queueId) => {
   if (!res.ok) throw new Error("Failed to remove from match queue");
   return res.json();
 };
+
