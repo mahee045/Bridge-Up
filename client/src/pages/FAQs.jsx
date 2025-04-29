@@ -22,7 +22,7 @@ function FAQs() {
         <p>You can discuss career goals, personal development, networking, industry insights, or even resume feedback. It’s your time—make it count!</p>
 
         <h3>5. How long is each mentorship session?</h3>
-        <p>Sessions typically last around 20–30 minutes, but the length can vary depending on the platform’s design and user availability.</p>
+        <p>Sessions typically last around 20–30 minutes, but the length can vary depending on the user availability.</p>
 
         <h3>6. Can I cancel a session?</h3>
         <p>You can cancel a session. Please try to notify the other party in advance out of respect for their time.</p>
