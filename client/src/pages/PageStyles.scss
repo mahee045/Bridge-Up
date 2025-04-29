@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+.page-container {
+  max-width: 800px;
+  margin: 80px auto 40px;
+  padding: 30px;
+  text-align: center;
+  font-family: 'Nunito', sans-serif;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.page-container h1 {
+  font-size: 2.8rem;
+  margin-bottom: 30px;
+  color: #1e293b;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.page-container p {
+  font-size: 1.2rem;
+  color: #475569;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+/* FAQ styles */
+.faq-list {
+  text-align: left;
+  margin-top: 40px;
+}
+
+.faq-list h3 {
+  margin-top: 30px;
+  font-size: 1.3rem;
+  color: #1e293b;
+  font-weight: 700;
+  position: relative;
+  padding-left: 20px;
+}
+
+.faq-list h3::before {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  font-size: 1rem;
+  color: #f59e0b;
+}
+
+.faq-list p {
+  font-size: 1.1rem;
+  color: #475569;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  padding-left: 20px;
+  border-left: 3px solid #facc15;
+  background-color: #fefce8;
+  padding: 10px 15px;
+  border-radius: 6px;
+}
+
+/* Responsive tweak */
+@media (max-width: 600px) {
+  .page-container {
+    padding: 20px 15px;
+  }
+
+  .page-container h1 {
+    font-size: 2rem;
+  }
+
+  .faq-list h3 {
+    font-size: 1.2rem;
+  }
+
+  .faq-list p {
+    font-size: 1rem;
+  }
+}

@@ -6,6 +6,10 @@ import ChatPage from "./pages/ChatPage";
 import Feedback from "./pages/Feedback";
 import Session from "./pages/Session";
 import Navbar from "./pages/NavBar";
+import Community from "./pages/Community";
+import Resources from "./pages/Resources";
+import FAQs from "./pages/FAQs";
+import AboutUs from "./pages/AboutUs";
 
 
 // You can remove either Landing or Home if you only use one for "/"
@@ -26,6 +30,10 @@ function App() {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/session" element={<Session />} />
         <Route path="/feedback" element={<Feedback />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/faqs" element={<FAQs />} />
+        <Route path="/about" element={<AboutUs />} />
       </Routes>
     </Router>
   );
