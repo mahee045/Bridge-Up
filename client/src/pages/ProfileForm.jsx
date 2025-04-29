@@ -63,7 +63,7 @@ import React, { useState } from "react";
       .then((createdUser) => {
         console.log("✅ User inserted and added to match queue:", createdUser);
         alert("Submitted successfully!");
-        navigate(`/matching-lobby?userId=${createdUser.id}`);
+        navigate(`/matching-lobby?userId=${createdUser.id}&userName=${createdUser.name}&role=${createdUser.role}`);
       })
       .catch((err) => {
         console.error("❌ Something went wrong:", err);

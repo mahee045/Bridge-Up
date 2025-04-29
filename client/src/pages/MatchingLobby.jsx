@@ -9,9 +9,10 @@ export default function MatchingLobby() {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [searchParams] = useSearchParams();
 
-  // Get the current user's ID and username from the URL parameters
-  const userId = searchParams.get('userId');
-  const userName = searchParams.get('userName'); // <-- Important to also get the user's own name
+  // Get the current user's info from the URL parameters
+  const userId = searchParams.get("userId");
+  const userName = searchParams.get("userName");
+  const userRole = searchParams.get("role"); // <-- Also grab role!
 
   // Helpful tips shown while waiting for a match
   const tips = [
@@ -32,7 +33,7 @@ export default function MatchingLobby() {
         console.error(err);
         setMessage("Network error—check your server.");
       }
-    }, 3000); // Simulate a 3-second matching wait
+    }, 3000);
   }, [navigate, userId]);
 
   // Handle cancellation: remove user from match queue and return to home
@@ -53,7 +54,6 @@ export default function MatchingLobby() {
 
   return (
     <div className="matching-lobby">
-      {/* Show loading spinner while searching for matches */}
       {matches.length === 0 ? (
         <>
           <div className="spinner">
@@ -65,7 +65,6 @@ export default function MatchingLobby() {
           <h2 className="title">{message}</h2>
           <p className="subtitle">Hang tight! We’re finding someone for you.</p>
 
-          {/* Helpful tips for user while waiting */}
           <div className="tips-box">
             <h3>Tips while you wait:</h3>
             <ul>
@@ -75,7 +74,6 @@ export default function MatchingLobby() {
             </ul>
           </div>
 
-          {/* Cancel and go back button */}
           <button onClick={handleCancel} className="cancel-btn">
             Cancel & Go Back
           </button>
@@ -84,12 +82,11 @@ export default function MatchingLobby() {
         <div className="matches-list">
           <h2 className="title">Your Matches</h2>
 
-          {/* List all matched users */}
           {matches.filter(Boolean).map((match, i) => (
             <div
               key={match.id || `match-${i}`}
               className="match-card"
-              onClick={() => setSelectedMatch(match)} // Open modal on card click
+              onClick={() => setSelectedMatch(match)}
               style={{ cursor: "pointer", border: "1px solid #ccc", padding: 10, margin: 8 }}
             >
               <p>
@@ -102,11 +99,12 @@ export default function MatchingLobby() {
                 ))}
               </ul>
 
-              {/* Direct join button without opening modal */}
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent opening the modal if button clicked
-                  navigate(`/chat?userId=${userId}&partnerId=${match.user_id}&userName=${userName}&partnerName=${match.name}`);
+                  e.stopPropagation();
+                  navigate(
+                    `/chat?userId=${userId}&partnerId=${match.user_id}&userName=${userName}&userRole=${userRole}&partnerName=${match.name}&partnerRole=${match.role}`
+                  );
                 }}
               >
                 Join Chat
@@ -116,7 +114,6 @@ export default function MatchingLobby() {
         </div>
       )}
 
-      {/* Modal for selected match details */}
       {selectedMatch && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -132,15 +129,17 @@ export default function MatchingLobby() {
             <p><strong>Bio:</strong> {selectedMatch.bio}</p>
 
             <div className="modal-buttons">
-              {/* Join chat via modal */}
               <button
                 className="join-btn"
-                onClick={() => navigate(`/chat?userId=${userId}&partnerId=${selectedMatch.user_id}&userName=${userName}&partnerName=${selectedMatch.name}`)}
+                onClick={() =>
+                  navigate(
+                    `/chat?userId=${userId}&partnerId=${selectedMatch.user_id}&userName=${userName}&userRole=${userRole}&partnerName=${selectedMatch.name}&partnerRole=${selectedMatch.role}`
+                  )
+                }
               >
                 Join Chat
               </button>
 
-              {/* Close modal */}
               <button
                 className="cancel-btn"
                 onClick={() => setSelectedMatch(null)}

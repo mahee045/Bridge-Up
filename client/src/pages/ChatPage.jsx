@@ -10,22 +10,28 @@ export default function ChatPage() {
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  // Extract relevant URL parameters: IDs and user names
+  // Extract relevant URL parameters
   const userId = searchParams.get("userId");
   const partnerId = searchParams.get("partnerId");
   const userName = searchParams.get("userName");
   const partnerName = searchParams.get("partnerName");
+  const userRole = searchParams.get("userRole");
+  const partnerRole = searchParams.get("partnerRole");
 
-  // Local state for message list and input field
+  // Determine actual mentor and mentee
+  const mentorName = userRole === "mentor" ? userName : partnerName;
+  const menteeName = userRole === "mentee" ? userName : partnerName;
+
+  // Local state
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
-  // Helper function to determine consistent room naming convention
+  // Helper to create consistent room name
   function getRoomName(id1, id2) {
     return [id1, id2].sort().join("-");
   }
 
-  // Establish socket connection and manage message listening
+  // Set up socket connection
   useEffect(() => {
     if (!userId || !partnerId) {
       console.error("Missing userId or partnerId. Cannot establish room.");
@@ -35,29 +41,27 @@ export default function ChatPage() {
     socketRef.current = io("http://localhost:3001");
 
     const room = getRoomName(userId, partnerId);
-
     socketRef.current.emit("join_room", room);
 
     socketRef.current.on("receive_message", (data) => {
       setMessages((prev) => [...prev, data]);
     });
 
-    // Cleanup connection on component unmount
     return () => {
       socketRef.current.disconnect();
     };
   }, [userId, partnerId]);
 
-  // Ensure chat scrolls automatically to the latest message
+  // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  // Handle sending new message
+  // Send new message
   const handleSend = () => {
-    if (input.trim() === "") return; // Prevent empty messages
+    if (input.trim() === "") return;
 
     const room = getRoomName(userId, partnerId);
 
@@ -72,7 +76,7 @@ export default function ChatPage() {
     setInput("");
   };
 
-  // Manage ending session and cleaning up queue participation
+  // End session + cleanup
   const handleEndSession = async () => {
     const queueId = localStorage.getItem("queueId");
     if (queueId) {
@@ -86,12 +90,14 @@ export default function ChatPage() {
     navigate(`/feedback?from_user_id=${userId}&partner_user_id=${partnerId}`);
   };
 
-  // Format timestamps for human-readable chat bubbles
+  // Format timestamps
   function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    const formattedTime = `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")} ${hours >= 12 ? "PM" : "AM"}`;
+    const formattedTime = `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")} ${
+      hours >= 12 ? "PM" : "AM"
+    }`;
     return formattedTime;
   }
 
@@ -99,13 +105,11 @@ export default function ChatPage() {
     <div className="chat-page">
       <h2>Chat Room</h2>
 
-      {/* Display usernames instead of system IDs */}
       <div>
-        <p><strong>Mentor:</strong> {userName}</p>
-        <p><strong>Mentee:</strong> {partnerName}</p>
+        <p><strong>Mentor:</strong> {mentorName}</p>
+        <p><strong>Mentee:</strong> {menteeName}</p>
       </div>
 
-      {/* Message history list */}
       <div className="chat-messages">
         {messages.length === 0 ? (
           <p className="no-messages">No messages yet.</p>
@@ -113,9 +117,8 @@ export default function ChatPage() {
           messages.map((msg, idx) => (
             <div
               key={idx}
-              className={`chat-message ${msg.system ? "system" : (msg.sender === userId ? "you" : "partner")}`}
+              className={`chat-message ${msg.system ? "system" : msg.sender === userId ? "you" : "partner"}`}
             >
-              {/* System messages vs. user-generated content */}
               {msg.system ? (
                 <em>{msg.text}</em>
               ) : (
@@ -129,11 +132,9 @@ export default function ChatPage() {
             </div>
           ))
         )}
-        {/* Reference to keep scroll at bottom */}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input field and send button */}
       <div className="chat-input-row">
         <input
           type="text"
@@ -150,7 +151,6 @@ export default function ChatPage() {
         </button>
       </div>
 
-      {/* End session button */}
       <button
         onClick={handleEndSession}
         style={{
