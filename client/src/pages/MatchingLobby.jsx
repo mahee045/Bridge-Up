@@ -9,19 +9,16 @@ export default function MatchingLobby() {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [searchParams] = useSearchParams();
 
-  // Get the current user's info from the URL parameters
   const userId = searchParams.get("userId");
   const userName = searchParams.get("userName");
-  const userRole = searchParams.get("role"); // <-- Also grab role!
+  const userRole = searchParams.get("role");
 
-  // Helpful tips shown while waiting for a match
   const tips = [
     "💬 Be ready to introduce yourself!",
     "🎯 Mention what you’re hoping to get out of the session!",
     "💡 You can ask about career paths, tools, or mindset.",
   ];
 
-  // Fetch potential matches from the server
   useEffect(() => {
     setTimeout(async () => {
       try {
@@ -36,7 +33,6 @@ export default function MatchingLobby() {
     }, 3000);
   }, [navigate, userId]);
 
-  // Handle cancellation: remove user from match queue and return to home
   const handleCancel = async () => {
     const queueId = localStorage.getItem("queueId");
     if (queueId) {
@@ -98,17 +94,7 @@ export default function MatchingLobby() {
                   <li key={`${interest}-${idx}`}>{interest}</li>
                 ))}
               </ul>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(
-                    `/chat?userId=${userId}&partnerId=${match.user_id}&userName=${userName}&userRole=${userRole}&partnerName=${match.name}&partnerRole=${match.role}`
-                  );
-                }}
-              >
-                Join Chat
-              </button>
+              {/* Removed direct Join Chat button here */}
             </div>
           ))}
         </div>
