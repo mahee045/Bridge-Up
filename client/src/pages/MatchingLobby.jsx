@@ -5,6 +5,7 @@ import "./MatchingLobby.scss";
 export default function MatchingLobby() {
   const navigate = useNavigate();
   const [matches, setMatches] = useState([]);
+  const [userInterests, setUserInterests] = useState([]);
   const [message, setMessage] = useState("Looking for a match…");
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [searchParams] = useSearchParams();
@@ -19,6 +20,22 @@ export default function MatchingLobby() {
     "💡 You can ask about career paths, tools, or mindset.",
   ];
 
+  // Fetch current user interests
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch(`http://localhost:3001/users/${userId}`);
+        const data = await res.json();
+        setUserInterests(data.interests || []);
+      } catch (error) {
+        console.error("Failed to fetch user interests:", error);
+      }
+    }
+
+    if (userId) fetchUser();
+  }, [userId]);
+
+  // Fetch potential matches
   useEffect(() => {
     setTimeout(async () => {
       try {
@@ -33,6 +50,7 @@ export default function MatchingLobby() {
     }, 3000);
   }, [navigate, userId]);
 
+  // Handle cancel
   const handleCancel = async () => {
     const queueId = localStorage.getItem("queueId");
     if (queueId) {
@@ -47,6 +65,16 @@ export default function MatchingLobby() {
     }
     navigate("/");
   };
+
+  // Compute sorted matches based on shared interests
+  const sortedMatches = [...matches]
+    .map(match => {
+      const shared = match.interests.filter(interest =>
+        userInterests.includes(interest)
+      );
+      return { ...match, sharedInterests: shared };
+    })
+    .sort((a, b) => b.sharedInterests.length - a.sharedInterests.length);
 
   return (
     <div className="matching-lobby">
@@ -78,7 +106,7 @@ export default function MatchingLobby() {
         <div className="matches-list">
           <h2 className="title">Your Matches</h2>
 
-          {matches.filter(Boolean).map((match, i) => (
+          {sortedMatches.map((match, i) => (
             <div
               key={match.id || `match-${i}`}
               className="match-card"
@@ -88,13 +116,13 @@ export default function MatchingLobby() {
               <p>
                 <strong>{match.role === "mentor" ? "Mentor Name:" : "Mentee Name:"}</strong> {match.name}
               </p>
+              <p><em>💡{match.sharedInterests.length} Shared Interest{match.sharedInterests.length !== 1 ? "s" : ""}</em></p>
               <p>Matching interests:</p>
               <ul>
                 {match.interests.map((interest, idx) => (
                   <li key={`${interest}-${idx}`}>{interest}</li>
                 ))}
               </ul>
-              {/* Removed direct Join Chat button here */}
             </div>
           ))}
         </div>
