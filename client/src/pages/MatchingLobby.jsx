@@ -104,7 +104,7 @@ export default function MatchingLobby() {
         </>
       ) : (
         <div className="matches-list">
-          <h2 className="title">Your Matches</h2>
+          <h2 className="title">✨Your Matches✨</h2>
 
           {sortedMatches.map((match, i) => (
             <div
@@ -119,10 +119,16 @@ export default function MatchingLobby() {
               <p><em>💡{match.sharedInterests.length} Shared Interest{match.sharedInterests.length !== 1 ? "s" : ""}</em></p>
               <p>Matching interests:</p>
               <ul>
-                {match.interests.map((interest, idx) => (
-                  <li key={`${interest}-${idx}`}>{interest}</li>
-                ))}
-              </ul>
+  {match.interests.map((interest, idx) => (
+    <li key={`${interest}-${idx}`}>
+      {match.sharedInterests.includes(interest) ? (
+        <strong>❤️{interest}</strong>
+      ) : (
+        interest
+      )}
+    </li>
+  ))}
+</ul>
             </div>
           ))}
         </div>
