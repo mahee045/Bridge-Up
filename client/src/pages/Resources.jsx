@@ -14,20 +14,29 @@ function Resources() {
         <ul>
           <li>
             <a
-              href="https://www.forbes.com/sites/forbescoachescouncil/2021/04/19/13-ways-to-become-an-exceptional-mentor/"
+              href="https://www.forbes.com/councils/forbescoachescouncil/2025/03/26/how-to-be-a-great-mentor-20-key-actions/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              13 Ways to Become an Exceptional Mentor – Forbes
+              How To Be A Great Mentor: 14 Key Actions – Forbes
             </a>
           </li>
           <li>
             <a
-              href="https://www.linkedin.com/pulse/how-make-most-your-mentorship-program-anthony-liew/"
+              href="https://phildeluna.com/making-the-most-of-mentorship/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              How to Make the Most of Your Mentorship – LinkedIn
+              Making The Most Of Mentorship – Phildeluna
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.themuse.com/advice/how-to-find-a-mentor"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              10 Tips for Finding a Mentor—and Making the Relationship Count – The Muse
             </a>
           </li>
         </ul>
@@ -38,20 +47,20 @@ function Resources() {
         <ul>
           <li>
             <a
-              href="https://hbr.org/2020/01/the-right-way-to-hold-people-accountable"
+              href="https://hbr.org/2022/08/5-ways-to-set-more-achievable-goals"
               target="_blank"
               rel="noopener noreferrer"
             >
-              The Right Way to Set Goals and Be Accountable – Harvard Business Review
+              5 Ways to Set More Achievable Goals – Harvard Business Review
             </a>
           </li>
           <li>
             <a
-              href="https://www.atlassian.com/blog/productivity/smart-goals"
+              href="https://www.atlassian.com/blog/work-management/goal-setting-templates"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Setting SMART Goals: Examples and Templates – Atlassian
+              10 goal setting templates to achieve your goals – Atlassian
             </a>
           </li>
         </ul>
@@ -62,20 +71,29 @@ function Resources() {
         <ul>
           <li>
             <a
-              href="https://www.coursera.org/articles/how-to-set-career-goals"
+              href="https://www.coursera.org/articles/career-goals"
               target="_blank"
               rel="noopener noreferrer"
             >
-              How to Set Meaningful Career Goals – Coursera
+              What Are Your Career Goals? Tips for Setting Your Goals – Coursera
             </a>
           </li>
           <li>
             <a
-              href="https://www.themuse.com/advice/20-things-every-professional-should-know-how-to-do-by-age-30"
+              href="https://www.coursera.org/articles/career-goals"
               target="_blank"
               rel="noopener noreferrer"
             >
-              20 Skills to Master in Your Career – The Muse
+              SMART goals template – Coursera
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.themuse.com/advice/in-demand-skills"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              15 In-Demand Skills to Master in Your Career – The Muse
             </a>
           </li>
         </ul>
@@ -86,11 +104,11 @@ function Resources() {
         <ul>
           <li>
             <a
-              href="https://www.mindtools.com/CommSkll/ActiveListening.htm"
+              href="https://www.verywellmind.com/what-is-active-listening-3024343"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Active Listening Techniques – MindTools
+              Active Listening Techniques – Verywellmind
             </a>
           </li>
           <li>
