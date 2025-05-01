@@ -1,75 +1,146 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
 
+:root {
+  --bold-primary: #0f172a;        // Dark navy for strong contrast
+  --bold-secondary: #475569;      // Muted slate gray
+  --bold-highlight: #f97316;      // Bright orange
+  --bold-yellow-bg: #fff7ed;      // Soft warm background
+  --bold-link: #1d4ed8;           // Vivid blue for links
+  --bold-link-hover: #1e40af;
+  --bold-shadow: rgba(15, 23, 42, 0.08);
+  --surface-bg: #ffffff;
+  --page-padding: 48px;
+}
+
+.page-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #f9fafb;
+}
+
 .page-container {
-  max-width: 800px;
-  margin: 80px auto 40px;
-  padding: 30px;
-  text-align: center;
+  max-width: 880px;
+  width: 100%;
+  margin: auto;
+  padding: var(--page-padding);
   font-family: 'Nunito', sans-serif;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  background-color: var(--surface-bg);
+  border-radius: 16px;
+  box-shadow: 0 16px 40px var(--bold-shadow);
+  text-align: center;
 }
 
 .page-container h1 {
-  font-size: 2.8rem;
-  margin-bottom: 30px;
-  color: #1e293b;
-  font-weight: 800;
+  font-size: 2.75rem;
+  color: var(--bold-primary);
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
   text-transform: capitalize;
 }
 
 .page-container p {
   font-size: 1.2rem;
-  color: #475569;
-  line-height: 1.7;
-  margin-bottom: 1.5rem;
+  color: var(--bold-secondary);
+  line-height: 1.75;
+  margin-bottom: 2rem;
 }
 
 /* FAQ styles */
 .faq-list {
   text-align: left;
-  margin-top: 40px;
+  margin-top: 3rem;
+}
+
+.faq-item {
+  margin-bottom: 2rem;
 }
 
 .faq-list h3 {
-  margin-top: 30px;
-  font-size: 1.3rem;
-  color: #1e293b;
+  font-size: 1.35rem;
   font-weight: 700;
+  color: var(--bold-primary);
+  cursor: pointer;
   position: relative;
-  padding-left: 20px;
-}
+  padding-left: 28px;
+  transition: all 0.2s ease;
 
-.faq-list h3::before {
-  position: absolute;
-  left: 0;
-  top: 2px;
-  font-size: 1rem;
-  color: #f59e0b;
+  &:hover {
+    color: var(--bold-highlight);
+  }
+
+  &::before {
+    content: "✼";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.2rem;
+    color: var(--bold-highlight);
+  }
 }
 
 .faq-list p {
   font-size: 1.1rem;
-  color: #475569;
-  margin-top: 8px;
-  margin-bottom: 20px;
+  margin-top: 0.75rem;
+  color: var(--bold-secondary);
+  background-color: var(--bold-yellow-bg);
+  padding: 14px 20px;
+  border-left: 4px solid var(--bold-highlight);
+  border-radius: 8px;
   line-height: 1.6;
-  padding-left: 20px;
-  border-left: 3px solid #facc15;
-  background-color: #fefce8;
-  padding: 10px 15px;
-  border-radius: 6px;
+  margin-left: 4px;
 }
 
-/* Responsive tweak */
-@media (max-width: 600px) {
-  .page-container {
-    padding: 20px 15px;
+/* Resource Section */
+.resource-section {
+  text-align: left;
+  margin-top: 3rem;
+
+  h2 {
+    font-size: 1.45rem;
+    color: var(--bold-primary);
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  ul {
+    padding-left: 1.5rem;
+    list-style-type: disc;
+
+    li {
+      margin-bottom: 0.75rem;
+
+      a {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--bold-link);
+        text-decoration: none;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: var(--bold-highlight);
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  :root {
+    --page-padding: 32px;
   }
 
   .page-container h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
+  }
+
+  .page-container p {
+    font-size: 1.1rem;
   }
 
   .faq-list h3 {
@@ -77,6 +148,14 @@
   }
 
   .faq-list p {
+    font-size: 1.05rem;
+  }
+
+  .resource-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .resource-section a {
     font-size: 1rem;
   }
 }
