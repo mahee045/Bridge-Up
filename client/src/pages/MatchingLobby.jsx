@@ -9,6 +9,7 @@ export default function MatchingLobby() {
   const [message, setMessage] = useState("Looking for a match…");
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [searchParams] = useSearchParams();
+  const [noMatchFound, setNoMatchFound] = useState(false);
 
   const userId = searchParams.get("userId");
   const userName = searchParams.get("userName");
@@ -41,8 +42,13 @@ export default function MatchingLobby() {
       try {
         const res = await fetch(`http://localhost:3001/match?userId=${userId}`);
         const data = await res.json();
-        setMessage("Matches found");
-        setMatches(data);
+        if (data.length === 0) {
+          setNoMatchFound(true);
+          setMessage("😞 No matches found. Please click Cancel.");
+        } else {
+          setMatches(data);
+          setMessage("Matches found");
+        }
       } catch (err) {
         console.error(err);
         setMessage("Network error—check your server.");
@@ -87,16 +93,22 @@ export default function MatchingLobby() {
             </svg>
           </div>
           <h2 className="title">{message}</h2>
-          <p className="subtitle">Hang tight! We’re finding someone for you.</p>
+          <p className="subtitle">
+            {noMatchFound
+              ? "No one is available right now."
+              : "Hang tight! We’re finding someone for you."}
+          </p>
 
-          <div className="tips-box">
-            <h3>Tips while you wait:</h3>
-            <ul>
-              {tips.map((tip) => (
-                <li key={tip}>{tip}</li>
-              ))}
-            </ul>
-          </div>
+          {!noMatchFound && (
+            <div className="tips-box">
+              <h3>Tips while you wait:</h3>
+              <ul>
+                {tips.map((tip) => (
+                  <li key={tip}>{tip}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <button onClick={handleCancel} className="cancel-btn">
             Cancel & Go Back
@@ -119,16 +131,16 @@ export default function MatchingLobby() {
               <p><em>💡{match.sharedInterests.length} Shared Interest{match.sharedInterests.length !== 1 ? "s" : ""}</em></p>
               <p>Matching interests:</p>
               <ul>
-  {match.interests.map((interest, idx) => (
-    <li key={`${interest}-${idx}`}>
-      {match.sharedInterests.includes(interest) ? (
-        <strong>❤️{interest}</strong>
-      ) : (
-        interest
-      )}
-    </li>
-  ))}
-</ul>
+                {match.interests.map((interest, idx) => (
+                  <li key={`${interest}-${idx}`}>
+                    {match.sharedInterests.includes(interest) ? (
+                      <strong>❤️{interest}</strong>
+                    ) : (
+                      interest
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

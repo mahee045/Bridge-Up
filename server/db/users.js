@@ -1,6 +1,6 @@
 // server/db/users.js
 const db = require("./index");
-const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require('uuid');
 
 async function createUser({name, role, interests, bio }) {
   const result = await db.query(
